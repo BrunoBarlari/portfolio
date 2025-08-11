@@ -1,30 +1,46 @@
 ---
-import Base from '../layouts/Base.astro';
-import MenuBar from '../components/MenuBar.astro';
-import Window from '../components/Window.astro';
-import Divider from '../components/Divider.astro';
-const base = ((import.meta as any).env?.BASE_URL) || '/';
+import Base from "../layouts/Base.astro";
+import MenuBar from "../components/MenuBar.astro";
+import Window from "../components/Window.astro";
+import Divider from "../components/Divider.astro";
+const base = (import.meta as any).env?.BASE_URL || "/";
 ---
-<Base title="About | Portfolio" description="Sobre mí: enfoque, valores y forma de trabajo.">
-  <MenuBar currentPath={Astro.url.pathname} />
-  <main id="content" class="pt-12 px-4 max-w-prose mx-auto">
-    <h1 class="hero-name mt-8">Sobre mí</h1>
-    <p class="mt-3 text-sm leading-relaxed">Trabajo para que las decisiones técnicas sumen valor real al negocio y al equipo. Me gusta simplificar, medir y mejorar.</p>
 
-    <Divider />
+<Base
+	title="About | Portfolio"
+	description="Sobre mí: enfoque, valores y forma de trabajo."
+>
+	<MenuBar currentPath={Astro.url.pathname} />
+	<main id="content" class="pt-12 px-4 max-w-prose mx-auto">
+		<h1 class="hero-name mt-8">Sobre mí</h1>
+		<p class="mt-3 text-sm leading-relaxed">
+			Trabajo para que las decisiones técnicas sumen valor real al negocio y al
+			equipo. Me gusta simplificar, medir y mejorar.
+		</p>
 
-    <Window title="Enfoque" initiallyOpen={true}>
-      <p>Priorizo legibilidad, pruebas y métricas. Prefiero soluciones pequeñas que podamos iterar rápido. Documentación breve, ejemplos claros y feedback constante.</p>
-    </Window>
+		<Divider />
 
-    <Window title="Cómo colaboro" initiallyOpen={true}>
-      <ul class="text-sm list-disc pl-5 leading-relaxed">
-        <li>Comunicación directa y asíncrona cuando tiene sentido.</li>
-        <li>Pull requests pequeños, con contexto y objetivos.</li>
-        <li>Observabilidad y monitoreo para evitar sorpresas.</li>
-      </ul>
-    </Window>
+		<Window title="Enfoque" initiallyOpen={true}>
+			<p>
+				Priorizo legibilidad, pruebas y métricas. Prefiero soluciones pequeñas
+				que podamos iterar rápido. Documentación breve, ejemplos claros y
+				feedback constante.
+			</p>
+		</Window>
 
-    <p class="text-sm mt-6">Volver a <a href={base} class="btn-link">Inicio</a> o ir a <a href={base + '#contact'} class="btn-link">Contacto</a>.</p>
-  </main>
+		<Window title="Cómo colaboro" initiallyOpen={true}>
+			<ul class="text-sm list-disc pl-5 leading-relaxed">
+				<li>Comunicación directa y asíncrona cuando tiene sentido.</li>
+				<li>Pull requests pequeños, con contexto y objetivos.</li>
+				<li>Observabilidad y monitoreo para evitar sorpresas.</li>
+			</ul>
+		</Window>
+
+		<p class="text-sm mt-6">
+			Volver a <a href={base} class="btn-link">Inicio</a> o ir a <a
+				href={base + "#contact"}
+				class="btn-link">Contacto</a
+			>.
+		</p>
+	</main>
 </Base>

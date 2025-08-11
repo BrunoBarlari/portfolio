@@ -1,44 +1,92 @@
 ---
-interface Props { title?: string; description?: string; };
-const { title = 'Portfolio | Desarrollador de Software', description = 'Portfolio profesional orientado a reclutadores y colegas técnicos.' } = Astro.props as Props;
-const siteUrl = Astro.site?.href || '';
-import '../styles/retro.css';
-import '../styles/tailwind.css';
-const base = ((import.meta as any).env?.BASE_URL) || '/';
+interface Props {
+	title?: string;
+	description?: string;
+}
+const {
+	title = "Portfolio | Desarrollador de Software",
+	description = "Portfolio profesional orientado a reclutadores y colegas técnicos.",
+} = Astro.props as Props;
+const siteUrl = Astro.site?.href || "";
+import "../styles/retro.css";
+import "../styles/tailwind.css";
+const base = (import.meta as any).env?.BASE_URL || "/";
 ---
-<!DOCTYPE html>
-<html lang="es" class="no-js" style={`--texture-url: url('${base}textures/dither-noise.svg');`}>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{title}</title>
-  <meta name="description" content={description} />
-  <meta name="theme-color" content="#F2F2F2" />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content={siteUrl} />
-  <meta property="og:image" content={siteUrl + 'og.png'} />
-  <link rel="canonical" href={siteUrl} />
-  <link rel="preload" href={base + 'fonts/ChicagoFLF.woff2'} as="font" type="font/woff2" crossorigin="anonymous" />
-  <link rel="preload" href={base + 'fonts/VT323.woff2'} as="font" type="font/woff2" crossorigin="anonymous" />
-  <link rel="icon" type="image/svg+xml" href={base + 'icons/apple.svg'} />
-  <link rel="stylesheet" href={base + 'fonts/fonts.css'} />
-  <meta name="color-scheme" content="light dark" />
-</head>
-<body>
-  <a href="#content" class="sr-only-focus">Saltar al contenido</a>
-  <slot />
-  <footer class="max-w-prose mx-auto px-4 pb-8 pt-4 text-xs opacity-80" role="contentinfo">
-    © <span id="year" /> · Construido con Astro. Interfaz inspirada en Macintosh System 7/8 para fines nostálgicos.
-  </footer>
-  <script is:inline>
-  document.documentElement.classList.remove('no-js');
-  document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-  <style is:inline>
-    .sr-only-focus{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
-    .sr-only-focus:focus{ position:fixed; left:8px; top:8px; width:auto; height:auto; padding:4px 6px; background:var(--platinum-50); color:var(--platinum-900); border:1px solid var(--border-dark); box-shadow: 1px 1px 0 var(--border-light), -1px -1px 0 var(--border-mid); z-index:100; }
-  </style>
-</body>
+
+<!doctype html>
+<html
+	lang="es"
+	class="no-js"
+	style={`--texture-url: url('${base}textures/dither-noise.svg');`}
+>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#F2F2F2" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={siteUrl} />
+		<meta property="og:image" content={siteUrl + "og.png"} />
+		<link rel="canonical" href={siteUrl} />
+		<link
+			rel="preload"
+			href={base + "fonts/ChicagoFLF.woff2"}
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="preload"
+			href={base + "fonts/VT323.woff2"}
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+		<link rel="icon" type="image/svg+xml" href={base + "icons/apple.svg"} />
+		<link rel="stylesheet" href={base + "fonts/fonts.css"} />
+		<meta name="color-scheme" content="light dark" />
+	</head>
+	<body>
+		<a href="#content" class="sr-only-focus">Saltar al contenido</a>
+		<slot />
+		<footer
+			class="max-w-prose mx-auto px-4 pb-8 pt-4 text-xs opacity-80"
+			role="contentinfo"
+		>
+			© <span id="year"></span> · Construido con Astro. Interfaz inspirada en Macintosh
+			System 7/8 para fines nostálgicos.
+		</footer>
+		<script is:inline>
+			document.documentElement.classList.remove("no-js");
+			document.getElementById("year").textContent = new Date().getFullYear();
+		</script>
+		<style is:inline>
+			.sr-only-focus {
+				position: absolute;
+				left: -10000px;
+				top: auto;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+			}
+			.sr-only-focus:focus {
+				position: fixed;
+				left: 8px;
+				top: 8px;
+				width: auto;
+				height: auto;
+				padding: 4px 6px;
+				background: var(--platinum-50);
+				color: var(--platinum-900);
+				border: 1px solid var(--border-dark);
+				box-shadow:
+					1px 1px 0 var(--border-light),
+					-1px -1px 0 var(--border-mid);
+				z-index: 100;
+			}
+		</style>
+	</body>
 </html>
