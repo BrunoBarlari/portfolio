@@ -1,0 +1,70 @@
+---
+// MenuBar component: classic Macintosh style pulldown menus
+interface Props { currentPath?: string }
+const { currentPath = '/' } = Astro.props as Props;
+const base = ((import.meta as any).env?.BASE_URL) || '/';
+const normalize = (p:string) => (p.endsWith('/') ? p : p + '/');
+const isHome = currentPath === '/' || currentPath === base || normalize(currentPath) === normalize(base);
+const menus = [
+  { label: 'About', href: base + '#about' },
+  { label: 'Projects', href: base + '#projects' },
+  { label: 'Skills', href: base + '#skills' },
+  { label: 'Contact', href: base + '#contact' }
+];
+---
+<nav class="menubar" aria-label="Primary">
+  <a href={base} class="apple" aria-label="Inicio" aria-current={isHome ? 'page' : undefined}></a>
+  {menus.map(m => (
+    <div class="menu-root" data-menu>
+      <button class="menu-button" type="button" aria-haspopup="true" aria-expanded="false">{m.label}</button>
+      <ul class="menu-list" role="menu" aria-label={m.label + ' menu'}>
+        <li class="menu-item"><a role="menuitem" href={m.href}>{m.label} section</a></li>
+        {m.label === 'About' && (
+          <li class="menu-item"><a role="menuitem" href={base + 'about'} aria-current={currentPath.endsWith('/about') ? 'page' : undefined}>About page</a></li>
+        )}
+        {m.label === 'Projects' && (
+          <li class="menu-item"><a role="menuitem" href={base + 'projects'} aria-current={currentPath.endsWith('/projects') ? 'page' : undefined}>Projects page</a></li>
+        )}
+      </ul>
+    </div>
+  ))}
+  <div class="clock" aria-live="polite" data-clock>00:00</div>
+  <div class="status" aria-hidden="true">OK</div>
+</nav>
+<script is:inline>
+(function(){
+  const root = document.currentScript.parentElement;
+  const menus = Array.from(root.querySelectorAll('[data-menu]'));
+  let openMenu = null;
+  function closeAll(){ menus.forEach(r=>{r.classList.remove('open'); const b=r.querySelector('button'); b && b.setAttribute('aria-expanded','false');}); openMenu=null; }
+  function focusMenu(idx){ const b=menus[idx]?.querySelector('button'); if(b){ b.focus(); }}
+  function handleListKeys(list, e){
+    const items = Array.from(list.querySelectorAll('a'));
+    const idx = items.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); items[(idx+1+items.length)%items.length]?.focus(); }
+    if(e.key==='ArrowUp'){ e.preventDefault(); items[(idx-1+items.length)%items.length]?.focus(); }
+    if(e.key==='Home'){ e.preventDefault(); items[0]?.focus(); }
+    if(e.key==='End'){ e.preventDefault(); items[items.length-1]?.focus(); }
+    if(e.key==='Escape'){ const parent = list.closest('[data-menu]'); const btn = parent?.querySelector('button'); closeAll(); btn?.focus(); }
+  }
+  menus.forEach((r, idx)=>{
+    const btn = r.querySelector('button');
+    const list = r.querySelector('.menu-list');
+    btn.addEventListener('click', e=>{ const isOpen = r.classList.contains('open'); closeAll(); if(!isOpen){ r.classList.add('open'); btn.setAttribute('aria-expanded','true'); openMenu=r; r.querySelector('.menu-item a')?.focus(); }});
+    btn.addEventListener('keydown', e=>{
+      if(e.key==='ArrowDown' || e.key==='Enter' || e.key===' '){ e.preventDefault(); r.classList.add('open'); btn.setAttribute('aria-expanded','true'); r.querySelector('.menu-item a')?.focus(); }
+      if(e.key==='ArrowRight'){ e.preventDefault(); focusMenu((idx+1)%menus.length); }
+      if(e.key==='ArrowLeft'){ e.preventDefault(); focusMenu((idx-1+menus.length)%menus.length); }
+    });
+    r.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeAll(); btn.focus(); }});
+    list.addEventListener('keydown', e=>handleListKeys(list, e));
+    r.addEventListener('mouseenter', ()=>{ if(openMenu && openMenu!==r){ closeAll(); r.classList.add('open'); btn.setAttribute('aria-expanded','true'); openMenu=r; }});
+  });
+  document.addEventListener('click', e=>{ if(!root.contains(e.target)) closeAll(); });
+  function updateClock(){ const el = root.querySelector('[data-clock]'); const d=new Date(); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); el.textContent=hh+':'+mm; }
+  updateClock(); setInterval(updateClock, 60*1000);
+})();
+</script>
+<style is:inline>
+/***** Scoped overrides if needed *****/
+</style>

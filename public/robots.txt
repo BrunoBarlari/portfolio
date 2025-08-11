@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+# Sitemap: set SITE_URL or replace below
+# Sitemap: https://example.com/sitemap.xml

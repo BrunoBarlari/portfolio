@@ -1,0 +1,24 @@
+---
+/** ToggleRetro: adds/removes class on html for retro overlay and dark variant */
+---
+<div class="retro-toggles" style="display:flex; gap:.5rem; align-items:center; font-size:12px;">
+  <label><input type="checkbox" data-scan /> Scanlines</label>
+  <label><input type="checkbox" data-dark /> Dark</label>
+</div>
+<script is:inline>
+(function(){
+  const root = document.currentScript.parentElement;
+  const scan = root.querySelector('[data-scan]');
+  const dark = root.querySelector('[data-dark]');
+  scan.checked = document.documentElement.classList.contains('retro-extra');
+  dark.checked = document.documentElement.classList.contains('dark');
+  scan.addEventListener('change',()=>{ document.documentElement.classList.toggle('retro-extra', scan.checked); localStorage.setItem('retroExtra', scan.checked?'1':'0'); });
+  dark.addEventListener('change',()=>{ document.documentElement.classList.toggle('dark', dark.checked); localStorage.setItem('retroDark', dark.checked?'1':'0'); });
+  // restore preferences
+  if(localStorage.getItem('retroExtra')==='1') { document.documentElement.classList.add('retro-extra'); scan.checked=true; }
+  if(localStorage.getItem('retroDark')==='1') { document.documentElement.classList.add('dark'); dark.checked=true; }
+})();
+</script>
+<style is:inline>
+.retro-toggles input { vertical-align:middle; }
+</style>
