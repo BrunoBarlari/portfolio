@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import MenuBar from '../components/MenuBar.astro';
+import Window from '../components/Window.astro';
+import Divider from '../components/Divider.astro';
+import { projects } from '../data/projects';
+const base = ((import.meta as any).env?.BASE_URL) || '/';
+---
+<Base title="Projects | Portfolio" description="Proyectos seleccionados y casos de estudio.">
+  <MenuBar currentPath={Astro.url.pathname} />
+  <main id="content" class="pt-12 px-4 max-w-prose mx-auto">
+    <h1 class="hero-name mt-8">Projects</h1>
+    <p class="mt-3 text-sm leading-relaxed">Trabajo en soluciones centradas en rendimiento, DX y claridad arquitectónica. Algunos ejemplos:</p>
+
+    <Divider />
+
+    <Window title="Listado" initiallyOpen={true}>
+      <div class="projects-list">
+        {projects.map(p => (
+          <article class="project">
+            <h3 class="project-title">{p.title} {p.year && <small class="year">· {p.year}</small>}</h3>
+            <p class="project-summary">{p.summary}</p>
+            {p.tech && <p class="project-tech">{p.tech.join(' · ')}</p>}
+            {p.links && p.links.length > 0 && (
+              <p class="project-links">
+                {p.links.map(l => (<a href={l.url} class="btn-link" rel="noopener noreferrer" target={l.url.startsWith('http') ? '_blank': undefined}>{l.label}</a>)).reduce((acc, el, i, arr)=> acc.concat(el, i < arr.length-1 ? ' · ' : ''), [])}
+              </p>
+            )}
+          </article>
+        ))}
+      </div>
+    </Window>
+
+    <p class="text-sm mt-6">Volver a <a href={base} class="btn-link">Inicio</a>.</p>
+  </main>
+</Base>

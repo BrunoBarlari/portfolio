@@ -1,0 +1,16 @@
+---
+/** Props: src (string), alt (string), href (string), size (number optional) */
+interface Props { src: string; alt: string; href?: string; size?: number; }
+const { src, alt, href = '#', size = 24 } = Astro.props as Props;
+const base = ((import.meta as any).env?.BASE_URL) || '/';
+const resolvedSrc = src.startsWith('/') ? base + src.slice(1) : src;
+---
+{href ? (
+  <a href={href} class="icon-btn" style={`width:${size}px;height:${size}px;`} aria-label={alt} rel="noopener noreferrer" target={href.startsWith('http') ? '_blank' : undefined}>
+    <img src={resolvedSrc} alt="" width={size} height={size} style="image-rendering:pixelated;" />
+  </a>
+) : (
+  <button type="button" class="icon-btn" style={`width:${size}px;height:${size}px;`} aria-label={alt}>
+    <img src={resolvedSrc} alt="" width={size} height={size} style="image-rendering:pixelated;" />
+  </button>
+)}

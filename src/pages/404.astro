@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import MenuBar from '../components/MenuBar.astro';
+---
+<Base title="404 | Página no encontrada" description="La página no existe">
+  <MenuBar />
+  <main id="content" class="pt-12 px-4 max-w-prose mx-auto">
+    <h1 class="hero-name mt-12">404</h1>
+    <p class="mt-3 text-sm">No encuentro lo que buscas. Quizás el enlace cambió.</p>
+    <p class="mt-4 text-sm"><a href="/" class="btn-link">Volver al inicio</a></p>
+  </main>
+</Base>
