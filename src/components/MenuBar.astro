@@ -19,12 +19,45 @@ const menus = [
 ---
 
 <nav class="menubar" aria-label="Primary">
-	<a
-		href={base}
-		class="apple"
-		aria-label="Inicio"
-		aria-current={isHome ? "page" : undefined}></a
-	>
+	<div class="menu-root apple" data-menu>
+		<button
+			class="menu-button"
+			type="button"
+			aria-haspopup="true"
+			aria-expanded="false"
+			aria-label="Apple menu"
+		>
+			
+		</button>
+		<ul class="menu-list" role="menu" aria-label="Apple menu">
+			<li class="menu-item">
+				<a
+					role="menuitem"
+					href={base}
+					aria-current={isHome ? "page" : undefined}>Home</a
+				>
+			</li>
+			<li class="menu-item">
+				<a
+					role="menuitem"
+					href={base + "about"}
+					aria-current={currentPath.endsWith("/about") ? "page" : undefined}
+					>About page</a
+				>
+			</li>
+			<li class="menu-item">
+				<a
+					role="menuitem"
+					href={base + "projects"}
+					aria-current={currentPath.endsWith("/projects") ? "page" : undefined}
+					>Projects page</a
+				>
+			</li>
+			<li class="menu-item">
+				<a role="menuitem" href={base + "#contact"}>Contact</a>
+			</li>
+		</ul>
+	</div>
 	{
 		menus.map((m) => (
 			<div class="menu-root" data-menu>
