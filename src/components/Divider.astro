@@ -1,13 +1,26 @@
 ---
 /** Simple visual divider (double line) */
-interface Props { label?: string }
+interface Props {
+	label?: string;
+}
 const { label } = Astro.props as Props;
 ---
+
 <div class="divider-double" role="separator" aria-orientation="horizontal">
-  <span></span>
-  <span></span>
-  {label && <span class="sr-only">{label}</span>}
+	<span></span>
+	<span></span>
+	{label && <span class="sr-only">{label}</span>}
 </div>
 <style is:inline>
-.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
 </style>

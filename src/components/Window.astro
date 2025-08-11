@@ -1,155 +1,256 @@
 ---
 /** Props: title (string), variant ('window'|'dialog'|'panel'), initiallyOpen (boolean), size ('sm'|'md'|'lg'), floating (boolean), x (number), y (number), w (number), h (number) **/
-interface Props { title: string; variant?: 'window'|'dialog'|'panel'; initiallyOpen?: boolean; size?: 'sm'|'md'|'lg'; floating?: boolean; x?: number; y?: number; w?: number; h?: number; }
-const { title, variant = 'window', initiallyOpen = true, size = 'md', floating = false, x, y, w, h } = Astro.props as Props;
-const bodyId = 'win-body-' + (Math.random().toString(36).slice(2));
+interface Props {
+	title: string;
+	variant?: "window" | "dialog" | "panel";
+	initiallyOpen?: boolean;
+	size?: "sm" | "md" | "lg";
+	floating?: boolean;
+	x?: number;
+	y?: number;
+	w?: number;
+	h?: number;
+}
+const {
+	title,
+	variant = "window",
+	initiallyOpen = true,
+	size = "md",
+	floating = false,
+	x,
+	y,
+	w,
+	h,
+} = Astro.props as Props;
+const bodyId = "win-body-" + Math.random().toString(36).slice(2);
 const initialStyle = floating
-  ? `${typeof y==='number' ? `top:${y}px;` : ''}${typeof x==='number' ? `left:${x}px;` : ''}${typeof w==='number' ? `width:${w}px;` : ''}${typeof h==='number' ? `height:${h}px;` : ''}`
-  : undefined;
+	? `${typeof y === "number" ? `top:${y}px;` : ""}${typeof x === "number" ? `left:${x}px;` : ""}${typeof w === "number" ? `width:${w}px;` : ""}${typeof h === "number" ? `height:${h}px;` : ""}`
+	: undefined;
 ---
-<section class={`window retro-border-outset ${variant}`} data-window data-size={size} data-open={initiallyOpen ? 'true':'false'} data-floating={floating ? 'true' : 'false'} style={initialStyle}>
-  <div class="title-bar" data-titlebar>
-    <button class="close-btn" type="button" aria-label="Cerrar" data-close aria-controls={bodyId} aria-expanded={initiallyOpen}>×</button>
-    <strong>{title}</strong>
-  </div>
-  <div class="window-body" data-body id={bodyId} aria-hidden={!initiallyOpen}>
-    <slot />
-  </div>
-  {floating && <div class="resize-handle br" data-resize="br" aria-hidden="true"></div>}
+
+<section
+	class={`window retro-border-outset ${variant}`}
+	data-window
+	data-size={size}
+	data-open={initiallyOpen ? "true" : "false"}
+	data-floating={floating ? "true" : "false"}
+	style={initialStyle}
+>
+	<div class="title-bar" data-titlebar>
+		<button
+			class="close-btn"
+			type="button"
+			aria-label="Cerrar"
+			data-close
+			aria-controls={bodyId}
+			aria-expanded={initiallyOpen}>×</button
+		>
+		<strong>{title}</strong>
+	</div>
+	<div class="window-body" data-body id={bodyId} aria-hidden={!initiallyOpen}>
+		<slot />
+	</div>
+	{
+		floating && (
+			<div class="resize-handle br" data-resize="br" aria-hidden="true" />
+		)
+	}
 </section>
 <script is:inline>
-(function(){
-  const root = document.currentScript.parentElement;
-  const titleBar = root.querySelector('[data-titlebar]');
-  const closeBtn = root.querySelector('[data-close]');
-  const body = root.querySelector('[data-body]');
-  const floating = root.getAttribute('data-floating')==='true';
-  let open = root.getAttribute('data-open')==='true';
+	(function () {
+		const root = document.currentScript.parentElement;
+		const titleBar = root.querySelector("[data-titlebar]");
+		const closeBtn = root.querySelector("[data-close]");
+		const body = root.querySelector("[data-body]");
+		const floating = root.getAttribute("data-floating") === "true";
+		let open = root.getAttribute("data-open") === "true";
 
-  function isMobile(){ return matchMedia('(max-width: 768px)').matches; }
+		function isMobile() {
+			return matchMedia("(max-width: 768px)").matches;
+		}
 
-  function bringToFront(){
-    const z = (window.__winZ || 100);
-    window.__winZ = z + 1;
-    root.style.zIndex = String(window.__winZ);
-  }
+		function bringToFront() {
+			const z = window.__winZ || 100;
+			window.__winZ = z + 1;
+			root.style.zIndex = String(window.__winZ);
+		}
 
-  function clamp(val, min, max){ return Math.min(Math.max(val, min), max); }
+		function clamp(val, min, max) {
+			return Math.min(Math.max(val, min), max);
+		}
 
-  function getCanvas(){
-    let el = root.parentElement;
-    while(el && !el.hasAttribute('data-desktop-canvas')) el = el.parentElement;
-    return el || document.body;
-  }
+		function getCanvas() {
+			let el = root.parentElement;
+			while (el && !el.hasAttribute("data-desktop-canvas"))
+				el = el.parentElement;
+			return el || document.body;
+		}
 
-  function rectNum(styleVal){ return parseFloat(String(styleVal||'0')) || 0; }
+		function rectNum(styleVal) {
+			return parseFloat(String(styleVal || "0")) || 0;
+		}
 
-  function ensurePositionDefaults(){
-    const cs = getComputedStyle(root);
-    if(cs.position !== 'absolute') return;
-    if(!root.style.left) root.style.left = '20px';
-    if(!root.style.top) root.style.top = '20px';
-    if(!root.style.width) root.style.width = Math.max(320, Math.min(560, getCanvas().clientWidth - 40)) + 'px';
-  }
+		function ensurePositionDefaults() {
+			const cs = getComputedStyle(root);
+			if (cs.position !== "absolute") return;
+			if (!root.style.left) root.style.left = "20px";
+			if (!root.style.top) root.style.top = "20px";
+			if (!root.style.width)
+				root.style.width =
+					Math.max(320, Math.min(560, getCanvas().clientWidth - 40)) + "px";
+		}
 
-  function initDragAndResize(){
-    if(!floating || isMobile()) return; // disable on mobile
-    root.style.position = 'absolute';
-    ensurePositionDefaults();
+		function initDragAndResize() {
+			if (!floating || isMobile()) return; // disable on mobile
+			root.style.position = "absolute";
+			ensurePositionDefaults();
 
-    titleBar.style.cursor = 'move';
-    titleBar.addEventListener('pointerdown', (e)=>{
-      if(e.button !== 0) return;
-      bringToFront();
-      const canvas = getCanvas();
-      const startX = e.clientX; const startY = e.clientY;
-      const rect = root.getBoundingClientRect();
-      const cRect = canvas.getBoundingClientRect();
-      const offsetX = rect.left - cRect.left; const offsetY = rect.top - cRect.top;
-      const startLeft = offsetX; const startTop = offsetY;
-      const w = rect.width; const h = rect.height;
-      root.setPointerCapture(e.pointerId);
-      function onMove(ev){
-        const dx = ev.clientX - startX; const dy = ev.clientY - startY;
-        const maxLeft = Math.max(0, canvas.clientWidth - w);
-        const maxTop = Math.max(0, canvas.clientHeight - h);
-        root.style.left = clamp(startLeft + dx, 0, maxLeft) + 'px';
-        root.style.top = clamp(startTop + dy, 0, maxTop) + 'px';
-      }
-      function onUp(ev){ root.releasePointerCapture(e.pointerId); window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); }
-      window.addEventListener('pointermove', onMove);
-      window.addEventListener('pointerup', onUp);
-    });
+			titleBar.style.cursor = "move";
+			titleBar.addEventListener("pointerdown", (e) => {
+				if (e.button !== 0) return;
+				bringToFront();
+				const canvas = getCanvas();
+				const startX = e.clientX;
+				const startY = e.clientY;
+				const rect = root.getBoundingClientRect();
+				const cRect = canvas.getBoundingClientRect();
+				const offsetX = rect.left - cRect.left;
+				const offsetY = rect.top - cRect.top;
+				const startLeft = offsetX;
+				const startTop = offsetY;
+				const w = rect.width;
+				const h = rect.height;
+				root.setPointerCapture(e.pointerId);
+				function onMove(ev) {
+					const dx = ev.clientX - startX;
+					const dy = ev.clientY - startY;
+					const maxLeft = Math.max(0, canvas.clientWidth - w);
+					const maxTop = Math.max(0, canvas.clientHeight - h);
+					root.style.left = clamp(startLeft + dx, 0, maxLeft) + "px";
+					root.style.top = clamp(startTop + dy, 0, maxTop) + "px";
+				}
+				function onUp(ev) {
+					root.releasePointerCapture(e.pointerId);
+					window.removeEventListener("pointermove", onMove);
+					window.removeEventListener("pointerup", onUp);
+				}
+				window.addEventListener("pointermove", onMove);
+				window.addEventListener("pointerup", onUp);
+			});
 
-    const handle = root.querySelector('[data-resize="br"]');
-    if(handle){
-      handle.addEventListener('pointerdown', (e)=>{
-        if(e.button !== 0) return;
-        bringToFront();
-        const canvas = getCanvas();
-        const startX = e.clientX; const startY = e.clientY;
-        const rect = root.getBoundingClientRect();
-        const cRect = canvas.getBoundingClientRect();
-        const startW = rect.width; const startH = rect.height;
-        const startL = rect.left - cRect.left; const startT = rect.top - cRect.top;
-        const minW = 280; const minH = 140;
-        root.setPointerCapture(e.pointerId);
-        function onMove(ev){
-          const dx = ev.clientX - startX; const dy = ev.clientY - startY;
-          const maxW = canvas.clientWidth - startL; const maxH = canvas.clientHeight - startT;
-          const newW = clamp(startW + dx, minW, maxW);
-          const newH = clamp(startH + dy, minH, maxH);
-          root.style.width = newW + 'px';
-          root.style.height = newH + 'px';
-        }
-        function onUp(){ root.releasePointerCapture(e.pointerId); window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); }
-        window.addEventListener('pointermove', onMove);
-        window.addEventListener('pointerup', onUp);
-      });
-    }
+			const handle = root.querySelector('[data-resize="br"]');
+			if (handle) {
+				handle.addEventListener("pointerdown", (e) => {
+					if (e.button !== 0) return;
+					bringToFront();
+					const canvas = getCanvas();
+					const startX = e.clientX;
+					const startY = e.clientY;
+					const rect = root.getBoundingClientRect();
+					const cRect = canvas.getBoundingClientRect();
+					const startW = rect.width;
+					const startH = rect.height;
+					const startL = rect.left - cRect.left;
+					const startT = rect.top - cRect.top;
+					const minW = 280;
+					const minH = 140;
+					root.setPointerCapture(e.pointerId);
+					function onMove(ev) {
+						const dx = ev.clientX - startX;
+						const dy = ev.clientY - startY;
+						const maxW = canvas.clientWidth - startL;
+						const maxH = canvas.clientHeight - startT;
+						const newW = clamp(startW + dx, minW, maxW);
+						const newH = clamp(startH + dy, minH, maxH);
+						root.style.width = newW + "px";
+						root.style.height = newH + "px";
+					}
+					function onUp() {
+						root.releasePointerCapture(e.pointerId);
+						window.removeEventListener("pointermove", onMove);
+						window.removeEventListener("pointerup", onUp);
+					}
+					window.addEventListener("pointermove", onMove);
+					window.addEventListener("pointerup", onUp);
+				});
+			}
 
-    // Click to focus/bring to front
-    root.addEventListener('pointerdown', bringToFront);
-  }
+			// Click to focus/bring to front
+			root.addEventListener("pointerdown", bringToFront);
+		}
 
-  function renderOpen(){
-    closeBtn.setAttribute('aria-expanded', String(open));
-    if(open){ body.removeAttribute('aria-hidden'); body.removeAttribute('inert'); }
-    else { body.setAttribute('aria-hidden','true'); body.setAttribute('inert',''); }
-  }
+		function renderOpen() {
+			closeBtn.setAttribute("aria-expanded", String(open));
+			if (open) {
+				body.removeAttribute("aria-hidden");
+				body.removeAttribute("inert");
+			} else {
+				body.setAttribute("aria-hidden", "true");
+				body.setAttribute("inert", "");
+			}
+		}
 
-  closeBtn.addEventListener('click',()=>{ open = !open; root.setAttribute('data-open', String(open)); renderOpen(); });
+		closeBtn.addEventListener("click", () => {
+			open = !open;
+			root.setAttribute("data-open", String(open));
+			renderOpen();
+		});
 
-  renderOpen();
-  initDragAndResize();
-  window.addEventListener('resize', ()=>{
-    // If viewport switched to mobile, reset to flow
-    if(isMobile()){
-      root.style.position = '';
-      root.style.left = '';
-      root.style.top = '';
-      root.style.width = '';
-      root.style.height = '';
-    } else if(floating){
-      root.style.position = 'absolute';
-      ensurePositionDefaults();
-    }
-  });
-})();
+		renderOpen();
+		initDragAndResize();
+		window.addEventListener("resize", () => {
+			// If viewport switched to mobile, reset to flow
+			if (isMobile()) {
+				root.style.position = "";
+				root.style.left = "";
+				root.style.top = "";
+				root.style.width = "";
+				root.style.height = "";
+			} else if (floating) {
+				root.style.position = "absolute";
+				ensurePositionDefaults();
+			}
+		});
+	})();
 </script>
 <style is:inline>
-.window { margin:1.5rem 0; }
-.window-body { padding:0.9rem 1.1rem 1.1rem; font-size:16px; line-height:1.5; }
-.dialog .title-bar { background: var(--platinum-300); }
-.panel .title-bar { background: var(--platinum-100); }
+	.window {
+		margin: 1.5rem 0;
+	}
+	.window-body {
+		padding: 0.9rem 1.1rem 1.1rem;
+		font-size: 16px;
+		line-height: 1.5;
+	}
+	.dialog .title-bar {
+		background: var(--platinum-300);
+	}
+	.panel .title-bar {
+		background: var(--platinum-100);
+	}
 
-/* Resize handle bottom-right */
-.resize-handle.br { position:absolute; right:4px; bottom:4px; width:12px; height:12px; cursor:nwse-resize; background:
-  linear-gradient(135deg, transparent 50%, var(--border-dark) 50%),
-  linear-gradient(135deg, transparent calc(50% - 2px), var(--border-light) calc(50% - 2px)); }
+	/* Resize handle bottom-right */
+	.resize-handle.br {
+		position: absolute;
+		right: 4px;
+		bottom: 4px;
+		width: 12px;
+		height: 12px;
+		cursor: nwse-resize;
+		background: linear-gradient(135deg, transparent 50%, var(--border-dark) 50%),
+			linear-gradient(
+				135deg,
+				transparent calc(50% - 2px),
+				var(--border-light) calc(50% - 2px)
+			);
+	}
 
-@media (max-width: 768px){
-  [data-floating="true"] .title-bar { cursor: default; }
-  .resize-handle { display:none; }
-}
+	@media (max-width: 768px) {
+		[data-floating="true"] .title-bar {
+			cursor: default;
+		}
+		.resize-handle {
+			display: none;
+		}
+	}
 </style>
