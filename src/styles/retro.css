@@ -15,6 +15,144 @@
   --border-light:#777; --border-mid:#555; --border-dark:#000; --focus-ring: var(--accent);
 }
 
+/* --- System 7.2 Theme Overrides (bitmap vibe) --- */
+:root{
+  /* — Tipografías — */
+  --font-ui: "ChicagoFLF","Krungthep","Geneva","Helvetica","Arial",sans-serif;
+  --font-mono: "Monaco","Menlo",monospace;
+
+  /* — Escala tipográfica — */
+  --fs-9: 12px;
+  --fs-10: 13px;
+  --fs-12: 14px;
+  --fs-14: 16px;
+
+  --lh-tight: 1.1;
+  --lh-ui: 1.2;
+
+  /* — Paleta grises clásica — */
+  --black: #000000;
+  --gray-90: #222222;
+  --gray-75: #444444;
+  --gray-60: #777777;
+  --gray-50: #888888;
+  --gray-35: #AAAAAA;
+  --gray-25: #BBBBBB;
+  --gray-10: #DDDDDD;
+  --white: #FFFFFF;
+
+  /* acentos de época */
+  --accent-blue: #0000D4;
+  --accent-cyan: #00ACE8;
+  --accent-green: #20B814;
+  --accent-red: #DC0808;
+
+  /* — Métrica — */
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+
+  /* — Bordes y sombras — */
+  --border: 1px solid var(--black);
+  --shade: var(--gray-25);
+  --highlight: var(--white);
+}
+
+/* Bitmap vibe */
+html,body{
+  font-family: var(--font-ui);
+  font-size: var(--fs-10);
+  line-height: var(--lh-ui);
+  color: var(--black);
+  background: var(--gray-10);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: auto;
+  image-rendering: pixelated;
+}
+
+/* Links accent override */
+.btn-link { color: var(--accent-blue) !important; }
+
+/* Ventana (chrome clásico + barra de título dither) */
+.window{
+  display: inline-block;
+  background: var(--white);
+  border: var(--border);
+  box-shadow: none; /* sin sombras modernas */
+  border-radius: 0;
+}
+.title-bar{
+  height: 18px;
+  display: flex; align-items:center; gap: var(--space-2);
+  padding: 0 var(--space-2);
+  font-size: var(--fs-12); font-weight: 700;
+  background: repeating-linear-gradient(45deg, var(--gray-25) 0 1px, var(--white) 1px 2px);
+  border-bottom: var(--border);
+}
+.close-btn{
+  width: 11px; height: 11px;
+  border: var(--border);
+  background: var(--white);
+  display:inline-block;
+  padding:0; line-height:0; color:transparent; overflow:hidden;
+  box-shadow:
+    inset -1px -1px 0 0 var(--gray-75),
+    inset  1px  1px 0 0 var(--highlight);
+}
+.window-body{ padding: var(--space-4); font-size: var(--fs-10); line-height: var(--lh-ui); }
+
+/* Botón System 7 */
+.btn{
+  display:inline-block; padding: 2px 8px;
+  border: var(--border);
+  background: var(--white);
+  box-shadow:
+    inset -1px -1px 0 0 var(--gray-75),
+    inset  1px  1px 0 0 var(--highlight);
+  font-size: var(--fs-10);
+  cursor: default;
+}
+.btn:active{
+  box-shadow:
+    inset  1px  1px 0 0 var(--gray-75),
+    inset -1px -1px 0 0 var(--highlight);
+}
+
+/* Campo de texto */
+.input{
+  border: var(--border);
+  background: var(--white);
+  padding: 2px 4px;
+  font: inherit;
+  box-shadow:
+    inset -1px -1px 0 0 var(--gray-75),
+    inset  1px  1px 0 0 var(--highlight);
+}
+
+/* Menú superior */
+.menubar{
+  position: sticky; top:0;
+  height: 18px; display:flex; gap:12px; align-items:center;
+  padding: 0 8px; background: var(--white); border-bottom: var(--border);
+  font-size: var(--fs-9);
+  z-index: 100;
+}
+/* items tipo botón en la barra */
+.menu-button{ padding: 0 4px; border:0; background:transparent; font: inherit; cursor: default; }
+.menu-button:hover, .menu-button:focus{ background: var(--black); color: var(--white); }
+
+/* listado desplegable */
+.menu-list{ background: var(--white); border: var(--border); box-shadow:none; padding:2px 0; }
+.menu-item{ padding: 0 4px; }
+.menu-item a{ display:block; padding: 2px 6px; color: inherit; text-decoration:none; }
+.menu-item:hover, .menu-item a:hover{ background: var(--black); color: var(--white); }
+.menuitem[aria-disabled="true"], .menu-item[aria-disabled="true"]{ color: var(--gray-60); }
+
+/* Lista de íconos */
+.iconlist{ display:grid; grid-template-columns: 32px 1fr; gap: var(--space-3); }
+.iconlist .label{ font-family: "Geneva","Helvetica",sans-serif; font-size: var(--fs-9); }
+
 html { font-family: 'Charcoal','Lucida Grande','Geneva','Arial',system-ui,sans-serif; background: var(--platinum-100); color: var(--platinum-900); font-size:17px; font-weight:600; }
 html.dark { background: var(--platinum-100); color: var(--platinum-900); }
 body { margin:0; min-height:100dvh; }
@@ -106,17 +244,59 @@ html.retro-extra body::after { content:''; pointer-events:none; position:fixed; 
   .window-body { transition: none !important; }
 }
 
-/* Close button filled square (System 7 vibe) */
-.title-bar .close-btn { display:grid; place-items:center; }
-.title-bar .close-btn::before { content: ''; width: 8px; height: 8px; background: #000; box-shadow: inset 1px 1px 0 #666, inset -1px -1px 0 #999; }
-html.dark .title-bar .close-btn::before { background:#111; box-shadow: inset 1px 1px 0 #888, inset -1px -1px 0 #333; }
+/* --- System 7.2 FINAL overrides (highest precedence) --- */
+:root{
+  --font-ui: "ChicagoFLF","Krungthep","Geneva","Helvetica","Arial",sans-serif;
+  --font-mono: "Monaco","Menlo",monospace;
+  --fs-9: 12px; --fs-10: 13px; --fs-12: 14px; --fs-14: 16px;
+  --lh-tight: 1.1; --lh-ui: 1.2;
+  --black:#000; --gray-90:#222; --gray-75:#444; --gray-60:#777; --gray-50:#888; --gray-35:#AAA; --gray-25:#BBB; --gray-10:#DDD; --white:#FFF;
+  --accent-blue:#0000D4; --accent-cyan:#00ACE8; --accent-green:#20B814; --accent-red:#DC0808;
+  --space-1:2px; --space-2:4px; --space-3:6px; --space-4:8px;
+  --border:1px solid var(--black); --shade:var(--gray-25); --highlight:var(--white);
+}
+html,body{ font-family: var(--font-ui); font-size: var(--fs-10); line-height: var(--lh-ui); color: var(--black); background: var(--gray-10); -webkit-font-smoothing:none; image-rendering: pixelated; font-weight:600; }
 
-/* Window depth + animation */
-.window { box-shadow: 0 6px 14px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; will-change: transform, opacity, box-shadow; animation: winIn 220ms var(--anim-ease) both; transition: box-shadow 160ms var(--anim-ease), transform 160ms var(--anim-ease); }
-.window:hover { box-shadow: 0 12px 28px rgba(0,0,0,0.2), 0 4px 10px rgba(0,0,0,0.08); transform: translateY(-1px); }
-@keyframes winIn { from { opacity: 0; transform: translateY(-4px) scale(0.995); } to { opacity: 1; transform: translateY(0) scale(1); } }
+/* Links */
+.btn-link { color: var(--accent-blue) !important; text-decoration: underline; text-underline-offset: 2px; }
 
-/* Smooth open/close body */
-.window-body { overflow: hidden; transition: opacity 180ms var(--anim-ease), transform 180ms var(--anim-ease), max-height 220ms var(--anim-ease), padding 180ms var(--anim-ease); }
-.window[data-open="true"] .window-body { opacity: 1; transform: none; max-height: 2000px; }
-.window[data-open="false"] .window-body { opacity: 0; transform: translateY(-6px); max-height: 0; padding-top: 0 !important; padding-bottom: 0 !important; }
+/* Flatten faux-3D helpers */
+.retro-border-outset, .retro-border-inset { border: 1px solid var(--black) !important; box-shadow: none !important; border-radius: 0 !important; }
+
+/* Window */
+.window { display:inline-block; background: var(--white); border: var(--border) !important; box-shadow: none !important; border-radius: 0 !important; }
+.title-bar { height:18px; display:flex; align-items:center; gap: var(--space-2); padding: 0 var(--space-2); font-size: var(--fs-12); font-weight:700; background: repeating-linear-gradient(45deg, var(--gray-25) 0 1px, var(--white) 1px 2px) !important; border-bottom: var(--border) !important; }
+.title-bar .close-btn::before { content: none !important; }
+.close-btn { width:11px; height:11px; border: var(--border); background: var(--white); box-shadow: inset -1px -1px 0 0 var(--gray-75), inset 1px 1px 0 0 var(--highlight); padding:0; line-height:0; color: transparent; }
+.window-body { padding: var(--space-4) !important; font-size: var(--fs-10) !important; line-height: var(--lh-ui) !important; }
+
+/* Buttons */
+.btn { display:inline-block; padding: 2px 8px; border: var(--border); background: var(--white); box-shadow: inset -1px -1px 0 0 var(--gray-75), inset 1px 1px 0 0 var(--highlight); font-size: var(--fs-10); cursor: default; }
+.btn:active { box-shadow: inset 1px 1px 0 0 var(--gray-75), inset -1px -1px 0 0 var(--highlight); }
+
+/* Inputs */
+.input { border: var(--border); background: var(--white); padding: 2px 4px; font: inherit; box-shadow: inset -1px -1px 0 0 var(--gray-75), inset 1px 1px 0 0 var(--highlight); }
+
+/* Menubar */
+.menubar { position: sticky !important; top:0; height:18px !important; display:flex; gap:12px; align-items:center; padding:0 8px !important; background: var(--white) !important; border-bottom: var(--border) !important; font-size: var(--fs-9) !important; box-shadow: none !important; z-index:100; }
+.menu-button { padding: 0 4px !important; border: 0 !important; background: transparent !important; font: inherit; cursor: default; }
+.menu-button:hover, .menu-button:focus { background: var(--black) !important; color: var(--white) !important; }
+.menu-list { background: var(--white) !important; border: var(--border) !important; box-shadow: none !important; padding: 2px 0 !important; min-width: 160px; }
+.menu-item { padding: 0 4px !important; }
+.menu-item a { display:block; padding: 2px 6px; color: inherit; text-decoration: none; }
+.menu-item:hover, .menu-item a:hover { background: var(--black) !important; color: var(--white) !important; }
+.menuitem[aria-disabled="true"], .menu-item[aria-disabled="true"]{ color: var(--gray-60) !important; }
+
+/* --- System 7.2 MENUBAR size + contrast overrides --- */
+.menubar{ height: 24px !important; font-size: var(--fs-12) !important; padding: 0 10px !important; color: var(--black) !important; }
+.menu-button{ height: 100% !important; padding: 0 8px !important; color: var(--black) !important; font-weight: 700; }
+.menu-list{ font-size: var(--fs-10) !important; }
+.menu-item{ padding: 0 6px !important; }
+.menu-item a{ padding: 3px 8px !important; color: var(--black) !important; text-decoration: none !important; }
+.menubar .clock, .menubar .status{ color: var(--black) !important; font-size: inherit; }
+
+/* --- Fixed desktop (no page scroll) --- */
+:root{ --menubar-height: 24px; }
+html, body { height: 100dvh; overflow: hidden; }
+.menubar{ height: var(--menubar-height) !important; }
+[data-desktop-canvas]{ position: relative; height: calc(100dvh - var(--menubar-height)); overflow: hidden; padding: 8px; }
