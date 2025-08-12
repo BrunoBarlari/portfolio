@@ -1,0 +1,133 @@
+---
+/** WindowDock: icons on the right to reopen hidden windows */
+const base = (import.meta as any).env?.BASE_URL || "/";
+const icons = [
+	{ id: "about-window", label: "About", src: base + "icons/apple.svg" },
+	{ id: "skills-window", label: "Skills", src: base + "icons/linkedin.svg" },
+	{ id: "contact-window", label: "Contact", src: base + "icons/email.svg" },
+	{ id: "projects-window", label: "Projects", src: base + "icons/github.svg" },
+];
+---
+
+<aside class="window-dock no-print" aria-label="Window Dock">
+	{
+		icons.map((i) => (
+			<button
+				class="dock-item"
+				type="button"
+				data-window-id={i.id}
+				aria-label={`Abrir ${i.label}`}
+			>
+				<img src={i.src} alt="" width="20" height="20" />
+			</button>
+		))
+	}
+</aside>
+
+<script is:inline>
+	(function () {
+		const root = document.currentScript.parentElement;
+		function ensureManager() {
+			// @ts-ignore
+			let wm = window.__windowManager;
+			if (!wm) {
+				wm = {
+					_v: {},
+					register(id, visible) {
+						this._v[id] = !!visible;
+						emit(id, !!visible);
+					},
+					setVisible(id, visible) {
+						this._v[id] = !!visible;
+						emit(id, !!visible);
+					},
+					isVisible(id) {
+						return !!this._v[id];
+					},
+					toggle(id) {
+						this.setVisible(id, !this.isVisible(id));
+					},
+				};
+				// @ts-ignore
+				window.__windowManager = wm;
+			}
+			return wm;
+		}
+		function emit(id, visible) {
+			try {
+				window.dispatchEvent(
+					new CustomEvent("window-visibility-change", {
+						detail: { id, visible },
+					})
+				);
+			} catch {}
+		}
+
+		const manager = ensureManager();
+
+		root.addEventListener("click", (e) => {
+			const target = e.target;
+			if (!(target instanceof Element)) return;
+			const btn = target.closest("[data-window-id]");
+			if (!btn) return;
+			const id = btn.getAttribute("data-window-id");
+			if (!id) return;
+			if (!manager.isVisible(id)) {
+				manager.setVisible(id, true);
+			}
+		});
+	})();
+</script>
+
+<style is:inline>
+	.window-dock {
+		position: fixed;
+		top: calc(var(--menubar-height) + 8px);
+		right: 8px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		z-index: 5; /* behind windows (>=10), above background (1) */
+		pointer-events: auto;
+	}
+	.dock-item {
+		width: 28px;
+		height: 28px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--platinum-50);
+		border: 1px solid var(--border-dark);
+		box-shadow:
+			1px 1px 0 var(--border-light),
+			-1px -1px 0 var(--border-mid);
+		padding: 0;
+		cursor: pointer;
+	}
+	.dock-item:active {
+		box-shadow:
+			inset 1px 1px 0 var(--border-light),
+			inset -1px -1px 0 var(--border-mid);
+	}
+	.dock-item img {
+		image-rendering: pixelated;
+		width: 20px;
+		height: 20px;
+	}
+
+	@media (max-width: 768px) {
+		.window-dock {
+			top: calc(var(--menubar-height) + 4px);
+			right: 4px;
+			gap: 6px;
+		}
+		.dock-item {
+			width: 26px;
+			height: 26px;
+		}
+		.dock-item img {
+			width: 18px;
+			height: 18px;
+		}
+	}
+</style>

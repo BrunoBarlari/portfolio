@@ -48,6 +48,47 @@ const {
 		const titleBar = windowEl.querySelector("[data-drag-handle]");
 		const closeBtn = windowEl.querySelector(".window-close-btn");
 
+		// Visibility manager (singleton on window)
+		function ensureManager() {
+			// @ts-ignore
+			let wm = window.__windowManager;
+			if (!wm) {
+				wm = {
+					_v: {},
+					register(id, visible) {
+						this._v[id] = !!visible;
+						try {
+							window.dispatchEvent(
+								new CustomEvent("window-visibility-change", {
+									detail: { id, visible: !!visible },
+								})
+							);
+						} catch {}
+					},
+					setVisible(id, visible) {
+						this._v[id] = !!visible;
+						try {
+							window.dispatchEvent(
+								new CustomEvent("window-visibility-change", {
+									detail: { id, visible: !!visible },
+								})
+							);
+						} catch {}
+					},
+					isVisible(id) {
+						return !!this._v[id];
+					},
+					toggle(id) {
+						this.setVisible(id, !this.isVisible(id));
+					},
+				};
+				// @ts-ignore
+				window.__windowManager = wm;
+			}
+			return wm;
+		}
+		const manager = ensureManager();
+
 		// Bring window to front
 		function bringToFront() {
 			const allWindows = document.querySelectorAll(".window-component");
@@ -122,14 +163,31 @@ const {
 			});
 		}
 
-		// Close button functionality
+		// Close button functionality: only hide and update manager
 		closeBtn.addEventListener("click", () => {
-			windowEl.style.display =
-				windowEl.style.display === "none" ? "block" : "none";
+			if (windowEl.style.display !== "none") {
+				windowEl.style.display = "none";
+				manager.setVisible(windowId, false);
+			}
+		});
+
+		// React to visibility changes from the dock
+		window.addEventListener("window-visibility-change", (e) => {
+			var detail = (e && e.detail) || {};
+			if (detail.id !== windowId) return;
+			if (detail.visible) {
+				windowEl.style.display = "block";
+				bringToFront();
+			} else {
+				windowEl.style.display = "none";
+			}
 		});
 
 		// Click to bring to front
 		windowEl.addEventListener("mousedown", bringToFront);
+
+		// Register initial visibility as true
+		manager.register(windowId, windowEl.style.display !== "none");
 
 		// Initialize when Interact.js is ready
 		if (window.interact) {

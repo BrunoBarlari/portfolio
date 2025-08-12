@@ -1,9 +1,11 @@
 ---
 /** Desktop: Fixed desktop environment background */
+import WindowDock from "./WindowDock.astro";
 ---
 
 <div class="desktop-background" data-desktop-canvas>
 	<slot />
+	<WindowDock />
 </div>
 
 <style is:inline>
@@ -28,6 +30,4 @@
 		-webkit-user-drag: none;
 		z-index: 1;
 	}
-
-	
 </style>
