@@ -55,16 +55,8 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 	<body>
 		<a href="#content" class="sr-only-focus">Saltar al contenido</a>
 		<slot />
-		<footer
-			class="max-w-prose mx-auto px-4 pb-8 pt-4 text-xs opacity-80"
-			role="contentinfo"
-		>
-			© <span id="year"></span> · Construido con Astro. Interfaz inspirada en Macintosh
-			System 7/8 para fines nostálgicos.
-		</footer>
 		<script is:inline>
 			document.documentElement.classList.remove("no-js");
-			document.getElementById("year").textContent = new Date().getFullYear();
 		</script>
 		<style is:inline>
 			.sr-only-focus {
