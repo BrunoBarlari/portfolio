@@ -1,0 +1,73 @@
+---
+import WindowBase from "./WindowBase.astro";
+const base = (import.meta as any).env?.BASE_URL || "/";
+---
+
+<WindowBase
+	title="About This Macintosh"
+	x={120}
+	y={80}
+	width={420}
+	height={300}
+	zIndex={15}
+	windowId="about-mac-window"
+	initiallyVisible={false}
+>
+	<div class="about-mac">
+		<div class="about-head">
+			<img src={base + "icons/apple.svg"} alt="" width="28" height="28" />
+			<div>
+				<div class="about-title">About This Macintosh</div>
+				<div class="about-sub">System 7.5 (simulado)</div>
+			</div>
+		</div>
+
+		<div class="divider-double" aria-hidden="true"><span></span><span></span></div>
+
+		<div class="mem-box">
+			<div class="mem-row"><span>Built-in Memory:</span><span>8,192K</span></div>
+			<div class="mem-row"><span>Application Memory:</span><span>5,120K</span></div>
+			<div class="mem-row"><span>Largest Unused Block:</span><span>3,072K</span></div>
+
+			<div class="mem-graph" role="img" aria-label="Memoria: 62% usada, 38% libre">
+				<div class="mem-used" style="width:62%"></div>
+			</div>
+			<div class="mem-legend">
+				<span class="swatch used"></span> Used
+				<span class="swatch free"></span> Free
+			</div>
+		</div>
+	</div>
+</WindowBase>
+
+<style is:inline>
+	.about-mac { font-size: var(--fs-10); }
+	.about-head { display:flex; gap:8px; align-items:center; }
+	.about-title { font-weight:700; }
+	.about-sub { opacity:.9; }
+
+	.mem-box { margin-top:8px; display:grid; gap:6px; }
+	.mem-row { display:flex; justify-content:space-between; }
+	.mem-row span:first-child{ padding-right:8px; }
+
+	/* Blocky memory graph */
+	.mem-graph {
+		position: relative;
+		height: 56px;
+		border: 1px solid var(--black);
+		background: #fff;
+		/* grid overlay: 1px lines every 8px */
+		background-image:
+			repeating-linear-gradient(to right, transparent 0 7px, var(--black) 7px 8px),
+			repeating-linear-gradient(to bottom, transparent 0 7px, var(--black) 7px 8px);
+		image-rendering: pixelated;
+	}
+	.mem-used {
+		position:absolute; inset:0 auto 0 0; height:100%;
+		background: var(--black);
+	}
+	.mem-legend { display:flex; gap:12px; align-items:center; }
+	.swatch { display:inline-block; width:10px; height:10px; border:1px solid var(--black); vertical-align:middle; margin-right:4px; }
+	.swatch.used { background: var(--black); }
+	.swatch.free { background: #fff; }
+</style>

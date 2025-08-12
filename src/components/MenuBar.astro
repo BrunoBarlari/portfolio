@@ -21,6 +21,14 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		</button>
 		<ul class="menu-list" role="menu" aria-label="Apple menu">
 			<li class="menu-item">
+				<button type="button" role="menuitem" data-open-about-mac
+					>About This Macintosh…</button
+				>
+			</li>
+			<li class="menu-item">
+				<hr aria-hidden="true" style="border:0; border-top:1px solid #000; margin:2px 0;" />
+			</li>
+			<li class="menu-item">
 				<button type="button" role="menuitem" data-open-about
 					>About This Site…</button
 				>
@@ -215,27 +223,32 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 			}
 		});
 
-		// Open About window from either Apple menu or right icon
-		function openAbout() {
+		// Open About windows
+		function openById(id) {
 			try {
 				// @ts-ignore
 				const wm = window.__windowManager;
 				if (wm && wm.setVisible) {
-					wm.setVisible("about-window", true);
+					wm.setVisible(id, true);
 					return;
 				}
 			} catch {}
 			try {
 				window.dispatchEvent(
 					new CustomEvent("window-visibility-change", {
-						detail: { id: "about-window", visible: true },
+						detail: { id, visible: true },
 					})
 				);
 			} catch {}
 		}
+		function openAbout() { openById("about-window"); }
+		function openAboutMac() { openById("about-mac-window"); }
 
 		root.querySelectorAll("[data-open-about]").forEach((el) => {
 			el.addEventListener("click", openAbout);
+		});
+		root.querySelectorAll("[data-open-about-mac]").forEach((el) => {
+			el.addEventListener("click", openAboutMac);
 		});
 
 		function updateClock() {
@@ -247,6 +260,35 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		}
 		updateClock();
 		setInterval(updateClock, 60 * 1000);
+
+		// Press-and-hold behavior (System 7 style)
+		let tracking = false;
+		root.addEventListener("mousedown", (e) => {
+			const t = e.target;
+			if (!(t instanceof Element)) return;
+			const btn = t.closest(".menu-button");
+			if (!btn) return;
+			const r = btn.closest("[data-menu]");
+			if (!r) return;
+			closeAll();
+			open(r);
+			tracking = true;
+			e.preventDefault();
+		});
+
+		document.addEventListener("mouseup", (e) => {
+			if (!tracking) return;
+			tracking = false;
+			const t = e.target;
+			if (t instanceof Element) {
+				const action = t.closest(".menu-item > button, .menu-item > a");
+				if (action) {
+					// trigger default click handlers
+					(action as HTMLElement).click();
+				}
+			}
+			closeAll();
+		});
 	})();
 </script>
 <style is:inline>
