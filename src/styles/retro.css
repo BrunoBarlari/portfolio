@@ -386,3 +386,35 @@ html, body {
 
 /* Larger clock to match taller menubar */
 .menubar .clock { font-size: var(--fs-14) !important; }
+
+/* --- Classic Menubar overrides (requested) --- */
+.menubar {
+  /* White bg, 1px black bottom border, Chicago 13 bold */
+  height: 20px !important;
+  background: #fff !important;
+  border-bottom: 1px solid #000 !important;
+  font: 700 13px "ChicagoFLF","Krungthep",sans-serif !important;
+  letter-spacing: .2px !important;
+  /* Layout */
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 8px !important;
+  gap: 14px !important;
+  color: #000 !important;
+}
+.menubar .menu-button {
+  padding: 0 10px !important;
+  color: #000 !important;
+}
+/* Inverted hover/active on top-level buttons */
+.menubar .menu-root.open > .menu-button,
+.menubar .menu-button:hover,
+.menubar .menu-button:focus {
+  background: #000 !important;
+  color: #fff !important;
+}
+/* Right-aligned clock with slight transparency */
+.menubar .clock {
+  margin-left: auto !important;
+  opacity: .9 !important;
+}
