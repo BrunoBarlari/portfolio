@@ -12,14 +12,12 @@ const icons = [
 <aside class="window-dock no-print" aria-label="Window Dock">
 	{
 		icons.map((i) => (
-			<button
-				class="dock-item"
-				type="button"
-				data-window-id={i.id}
-				aria-label={`Abrir ${i.label}`}
-			>
-				<img src={i.src} alt="" width="32" height="32" />
-			</button>
+			<div class="dock-entry" data-window-id={i.id}>
+				<button class="dock-item" type="button" aria-label={`Abrir ${i.label}`}>
+					<img src={i.src} alt="" width="32" height="32" />
+				</button>
+				<div class="dock-label">{i.label}</div>
+			</div>
 		))
 	}
 </aside>
@@ -86,9 +84,15 @@ const icons = [
 		right: 8px;
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 12px;
 		z-index: 5; /* behind windows (>=10), above background (1) */
 		pointer-events: auto;
+	}
+	.dock-entry {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
 	}
 	.dock-item {
 		width: 44px;
@@ -114,12 +118,19 @@ const icons = [
 		width: 32px;
 		height: 32px;
 	}
+	.dock-label {
+		font-size: var(--fs-9);
+		line-height: var(--lh-ui);
+		text-align: center;
+		color: var(--black);
+		user-select: none;
+	}
 
 	@media (max-width: 768px) {
 		.window-dock {
 			top: calc(var(--menubar-height) + 4px);
 			right: 4px;
-			gap: 8px;
+			gap: 10px;
 		}
 		.dock-item {
 			width: 36px;
@@ -128,6 +139,9 @@ const icons = [
 		.dock-item img {
 			width: 28px;
 			height: 28px;
+		}
+		.dock-label {
+			font-size: 12px;
 		}
 	}
 </style>
