@@ -33,8 +33,7 @@ const {
 	<div class="window-frame">
 		<div class="window-titlebar" data-drag-handle>
 			<button class="window-close-btn" type="button" aria-label="Cerrar"
-				>×</button
-			>
+			></button>
 			<span class="window-title-text">{title}</span>
 			<button class="window-zoom-btn" type="button" aria-label="Zoom"></button>
 		</div>
@@ -63,15 +62,24 @@ const {
 		async function getSfx() {
 			if (__sfx) return __sfx;
 			try {
-				if (window.__sfx) { __sfx = window.__sfx; return __sfx; }
-				const mod = await import('/src/lib/sfx.js');
-				__sfx = (mod && mod.getSfx) ? mod.getSfx() : null;
+				if (window.__sfx) {
+					__sfx = window.__sfx;
+					return __sfx;
+				}
+				const mod = await import("/src/lib/sfx.js");
+				__sfx = mod && mod.getSfx ? mod.getSfx() : null;
 				return __sfx;
-			} catch { return null; }
+			} catch {
+				return null;
+			}
 		}
 
-		function playOpen() { getSfx().then((s) => s && s.open && s.open()); }
-		function playClose() { getSfx().then((s) => s && s.close && s.close()); }
+		function playOpen() {
+			getSfx().then((s) => s && s.open && s.open());
+		}
+		function playClose() {
+			getSfx().then((s) => s && s.close && s.close());
+		}
 		// --- end SFX helper ---
 
 		function emitFocused() {
@@ -164,8 +172,10 @@ const {
 			allWindows.forEach((w) => {
 				const z = parseInt(w.style.zIndex) || 10;
 				if (z > maxZ) maxZ = z;
+				w.classList.remove("active");
 			});
 			windowEl.style.zIndex = (maxZ + 1).toString();
+			windowEl.classList.add("active");
 			emitFocused();
 		}
 
@@ -241,6 +251,26 @@ const {
 		}
 		zoomBtn.addEventListener("click", doZoomToggle);
 
+		// Global window command listener (close/shade/zoom) for keyboard shortcuts
+		window.addEventListener("window-command", (e) => {
+			const detail = (e && e.detail) || {};
+			const targetId = detail.id;
+			if (targetId !== windowId && targetId !== "ALL") return;
+			switch (detail.action) {
+				case "close":
+					closeBtn.click();
+					break;
+				case "shade":
+					doShadeToggle();
+					break;
+				case "zoom":
+					doZoomToggle();
+					break;
+				default:
+					break;
+			}
+		});
+
 		// Initialize Interact.js following the exact documentation pattern
 		function initInteract() {
 			if (!window.interact) return;
@@ -305,12 +335,22 @@ const {
 		}
 
 		// Close button functionality: only hide and update manager
-		closeBtn.addEventListener("click", () => {
-			if (windowEl.style.display !== "none") {
-				playClose();
-				windowEl.style.display = "none";
-				manager.setVisible(windowId, false);
-			}
+		closeBtn.addEventListener("pointerdown", (e) => {
+			if (e && e.preventDefault) e.preventDefault();
+			if (e && e.stopPropagation) e.stopPropagation();
+		});
+		closeBtn.addEventListener("click", (e) => {
+			if (e && e.preventDefault) e.preventDefault();
+			if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+			else if (e && e.stopPropagation) e.stopPropagation();
+			requestAnimationFrame(() => {
+				if (windowEl.style.display !== "none") {
+					playClose();
+					windowEl.style.display = "none";
+					manager.setVisible(windowId, false);
+					windowEl.classList.remove("active");
+				}
+			});
 		});
 
 		// React to visibility changes from the dock
@@ -393,6 +433,7 @@ const {
 	}
 
 	.window-close-btn {
+		position: relative;
 		width: 11px;
 		height: 11px;
 		border: var(--border);
@@ -406,6 +447,25 @@ const {
 		cursor: pointer;
 		flex-shrink: 0;
 	}
+	/* Pixelated X symbol for close button */
+	.window-close-btn::after {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 7px;
+		height: 7px;
+		transform: translate(-50%, -50%);
+		background: linear-gradient(
+				45deg,
+				transparent 3px,
+				#000 3px 4px,
+				transparent 4px
+			),
+			linear-gradient(-45deg, transparent 3px, #000 3px 4px, transparent 4px);
+		image-rendering: pixelated;
+	}
 
 	.window-title-text {
 		/* centrado absoluto */
@@ -416,6 +476,9 @@ const {
 		pointer-events: none;
 		white-space: nowrap;
 		text-align: center;
+		max-width: calc(100% - 48px);
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.window-zoom-btn {
@@ -434,10 +497,32 @@ const {
 		color: transparent;
 		cursor: pointer;
 	}
+	/* Pixelated plus symbol on zoom button */
+	.window-zoom-btn::after {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 7px;
+		height: 7px;
+		transform: translate(-50%, -50%);
+		background:
+			linear-gradient(#000, #000) center/1px 7px no-repeat,
+			linear-gradient(#000, #000) center/7px 1px no-repeat;
+		image-rendering: pixelated;
+	}
 	.window-zoom-btn:active {
 		box-shadow:
 			inset 1px 1px 0 0 var(--gray-75),
 			inset -1px -1px 0 0 var(--highlight);
+	}
+
+	/* Keyboard focus ring on titlebar buttons (1-bit style) */
+	.window-titlebar .window-close-btn:focus-visible,
+	.window-titlebar .window-zoom-btn:focus-visible {
+		outline: 1px dotted var(--black);
+		outline-offset: 0;
 	}
 
 	.window-body {
@@ -449,6 +534,14 @@ const {
 		overflow: auto;
 		position: relative; /* ancla para guide-pager absoluto */
 	}
+	/* Inner 1px border to emulate System 7 content frame */
+	.window-body::before {
+		content: "";
+		position: absolute;
+		inset: 4px;
+		border: 1px solid var(--black);
+		pointer-events: none;
+	}
 
 	.window-resize-handle {
 		position: absolute;
@@ -456,9 +549,51 @@ const {
 		bottom: 0;
 		width: 12px;
 		height: 12px;
-		cursor: nw-resize;
-		background: linear-gradient(135deg, transparent 50%, var(--gray-75) 50%);
+		cursor: nwse-resize;
+		background: linear-gradient(
+				135deg,
+				transparent 0 6px,
+				var(--black) 6px 7px,
+				transparent 7px
+			),
+			linear-gradient(
+				135deg,
+				transparent 0 9px,
+				var(--black) 9px 10px,
+				transparent 10px
+			),
+			linear-gradient(
+				135deg,
+				transparent 0 12px,
+				var(--black) 12px 13px,
+				transparent 13px
+			);
 		pointer-events: all;
+	}
+
+	/* Inactive window: lighter titlebar pattern and dimmed title */
+	.window-component:not(.active) .window-titlebar {
+		background: repeating-linear-gradient(
+			45deg,
+			var(--gray-10) 0 1px,
+			var(--white) 1px 2px
+		);
+	}
+	.window-component:not(.active) .window-title-text {
+		color: var(--gray-60);
+	}
+	.window-component:not(.active) .window-close-btn,
+	.window-component:not(.active) .window-zoom-btn {
+		opacity: 0.85;
+	}
+
+	/* Active window titlebar highlight */
+	.window-component.active .window-titlebar {
+		background: repeating-linear-gradient(
+			45deg,
+			var(--gray-35) 0 1px,
+			var(--white) 1px 2px
+		);
 	}
 
 	@media (max-width: 768px) {

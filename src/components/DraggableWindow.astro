@@ -75,9 +75,11 @@ const bodyId = "body-" + windowId;
 			allWindows.forEach((w) => {
 				const z = parseInt(w.style.zIndex) || 10;
 				if (z > maxZ) maxZ = z;
+				w.classList.remove("active");
 			});
 			currentZ = maxZ + 1;
 			windowElement.style.zIndex = currentZ;
+			windowElement.classList.add("active");
 		}
 
 		// Get desktop boundaries
@@ -250,15 +252,26 @@ const bodyId = "body-" + windowId;
 
 		// SFX helper
 		let __sfx = null;
-		async function getSfx(){
+		async function getSfx() {
 			if (__sfx) return __sfx;
-			try { if (window.__sfx) { __sfx = window.__sfx; return __sfx; }
-				const mod = await import('/src/lib/sfx.js');
-				__sfx = mod && mod.getSfx ? mod.getSfx() : null; return __sfx;
-			} catch { return null; }
+			try {
+				if (window.__sfx) {
+					__sfx = window.__sfx;
+					return __sfx;
+				}
+				const mod = await import("/src/lib/sfx.js");
+				__sfx = mod && mod.getSfx ? mod.getSfx() : null;
+				return __sfx;
+			} catch {
+				return null;
+			}
 		}
-		function playOpen(){ getSfx().then(s=>s&&s.open&&s.open()); }
-		function playClose(){ getSfx().then(s=>s&&s.close&&s.close()); }
+		function playOpen() {
+			getSfx().then((s) => s && s.open && s.open());
+		}
+		function playClose() {
+			getSfx().then((s) => s && s.close && s.close());
+		}
 
 		// Close window functionality (toggle body)
 		closeBtn.addEventListener("click", () => {
@@ -325,6 +338,7 @@ const bodyId = "body-" + windowId;
 	}
 
 	.close-btn {
+		position: relative;
 		width: 11px;
 		height: 11px;
 		border: var(--border);
@@ -339,10 +353,39 @@ const bodyId = "body-" + windowId;
 		flex-shrink: 0;
 	}
 
+	/* Pixel X mark */
+	.close-btn::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 7px;
+		height: 7px;
+		transform: translate(-50%, -50%);
+		background: linear-gradient(
+				45deg,
+				transparent 3px,
+				#000 3px 4px,
+				transparent 4px
+			),
+			linear-gradient(-45deg, transparent 3px, #000 3px 4px, transparent 4px);
+		image-rendering: pixelated;
+	}
+
+	/* Focus ring for titlebar button */
+	.title-bar .close-btn:focus-visible {
+		outline: 1px dotted var(--black);
+		outline-offset: 0;
+	}
+
 	.window-title {
 		flex: 1;
 		font-weight: 700;
 		pointer-events: none;
+		text-align: center;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.window-content {
@@ -373,13 +416,49 @@ const bodyId = "body-" + windowId;
 		bottom: 0;
 		width: 12px;
 		height: 12px;
-		cursor: nw-resize;
-		background: linear-gradient(135deg, transparent 50%, var(--gray-75) 50%);
+		cursor: nwse-resize;
+		background: linear-gradient(
+				135deg,
+				transparent 0 6px,
+				var(--black) 6px 7px,
+				transparent 7px
+			),
+			linear-gradient(
+				135deg,
+				transparent 0 9px,
+				var(--black) 9px 10px,
+				transparent 10px
+			),
+			linear-gradient(
+				135deg,
+				transparent 0 12px,
+				var(--black) 12px 13px,
+				transparent 13px
+			);
 	}
 
 	@media (max-width: 768px) {
 		.title-bar {
 			cursor: default;
+		}
+
+		/* Active/inactive title bar */
+		.draggable-window.active .title-bar {
+			background: repeating-linear-gradient(
+				45deg,
+				var(--gray-35) 0 1px,
+				var(--white) 1px 2px
+			);
+		}
+		.draggable-window:not(.active) .title-bar {
+			background: repeating-linear-gradient(
+				45deg,
+				var(--gray-10) 0 1px,
+				var(--white) 1px 2px
+			);
+		}
+		.draggable-window:not(.active) .window-title {
+			color: var(--gray-60);
 		}
 		.resize-handle {
 			display: none;

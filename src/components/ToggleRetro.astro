@@ -2,7 +2,10 @@
 /** ToggleRetro: only SFX toggle (persistence + respects prefers-reduced-motion) */
 ---
 
-<div class="retro-toggles" style="display:flex; gap:.5rem; align-items:center; font-size:12px;">
+<div
+	class="retro-toggles"
+	style="display:flex; gap:.5rem; align-items:center; font-size:12px;"
+>
 	<label><input type="checkbox" data-sfx /> SFX</label>
 </div>
 <script is:inline>
@@ -17,17 +20,19 @@
 			return !matchMedia("(prefers-reduced-motion: reduce)").matches;
 		}
 		sfx.checked = fallbackDefault();
-		import('/src/lib/sfx.js')
-			.then((mod) => mod && mod.getSfx ? mod.getSfx() : null)
+		import("/src/lib/sfx.js")
+			.then((mod) => (mod && mod.getSfx ? mod.getSfx() : null))
 			.then((api) => {
 				if (!api) return;
 				// sync UI
 				sfx.checked = !!api.enabled;
-				sfx.addEventListener('change', () => api.setEnabled(sfx.checked));
+				sfx.addEventListener("change", () => api.setEnabled(sfx.checked));
 			})
 			.catch(() => {});
 	})();
 </script>
 <style is:inline>
-	.retro-toggles input { vertical-align: middle; }
+	.retro-toggles input {
+		vertical-align: middle;
+	}
 </style>

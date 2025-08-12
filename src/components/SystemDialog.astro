@@ -1,0 +1,72 @@
+---
+/** Generic System 7-style dialog */
+interface Props {
+	title: string;
+	message: string;
+	windowId: string;
+	confirmLabel?: string;
+	cancelLabel?: string;
+}
+const {
+	title,
+	message,
+	windowId,
+	confirmLabel = "OK",
+	cancelLabel = "Cancel",
+} = Astro.props as Props;
+---
+
+<div
+	class="window-component"
+	id={windowId}
+	style="left: 50%; top: 30%; transform: translateX(-50%); width: 360px; z-index: 100; display:none;"
+>
+	<div class="window-frame">
+		<div class="window-titlebar" data-drag-handle>
+			<button class="window-close-btn" type="button" aria-label="Cerrar"
+			></button>
+			<span class="window-title-text">{title}</span>
+		</div>
+		<div class="window-body">
+			<div class="message">{message}</div>
+			<div
+				class="actions"
+				style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px;"
+			>
+				<button class="btn" data-confirm>{confirmLabel}</button>
+				<button class="btn" data-cancel>{cancelLabel}</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script is:inline>
+	(function () {
+		const root = document.currentScript.parentElement;
+		const closeBtn = root.querySelector(".window-close-btn");
+		const btnOk = root.querySelector("[data-confirm]");
+		const btnCancel = root.querySelector("[data-cancel]");
+		function show() {
+			root.style.display = "block";
+			try {
+				window.__sfx?.open?.();
+			} catch {}
+		}
+		function hide() {
+			root.style.display = "none";
+			try {
+				window.__sfx?.close?.();
+			} catch {}
+		}
+		closeBtn.addEventListener("click", hide);
+		btnOk.addEventListener("click", hide);
+		btnCancel.addEventListener("click", hide);
+
+		window.addEventListener("window-visibility-change", (e) => {
+			const d = (e && e.detail) || {};
+			if (d.id !== root.id) return;
+			if (d.visible) show();
+			else hide();
+		});
+	})();
+</script>

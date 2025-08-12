@@ -10,6 +10,9 @@ import HardDiskWindow from "../components/HardDiskWindow.astro";
 import TrashWindow from "../components/TrashWindow.astro";
 import ProjectDetailWindow from "../components/ProjectDetailWindow.astro";
 import { projects } from "../data/projects";
+import ControlPanelsWindow from "../components/ControlPanelsWindow.astro";
+import WindowBase from "../components/WindowBase.astro";
+import SystemDialog from "../components/SystemDialog.astro";
 ---
 
 <Base>
@@ -26,5 +29,31 @@ import { projects } from "../data/projects";
 		<AboutThisMacWindow />
 		<HardDiskWindow />
 		<TrashWindow />
+		<ControlPanelsWindow />
+		<WindowBase
+			title="Chooser"
+			x={160}
+			y={160}
+			width={280}
+			height={180}
+			windowId="chooser-window"
+			initiallyVisible={false}
+		>
+			<div class="text-sm opacity-80">Choose a device… (placeholder)</div>
+		</WindowBase>
+		<SystemDialog
+			title="Restart"
+			message="Are you sure you want to restart?"
+			windowId="restart-window"
+			confirmLabel="Restart"
+			cancelLabel="Cancel"
+		/>
+		<SystemDialog
+			title="Shut Down"
+			message="Are you sure you want to shut down?"
+			windowId="shutdown-window"
+			confirmLabel="Shut Down"
+			cancelLabel="Cancel"
+		/>
 	</Desktop>
 </Base>

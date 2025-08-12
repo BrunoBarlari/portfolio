@@ -43,9 +43,9 @@ const initialStyle = floating
 			aria-label="Cerrar"
 			data-close
 			aria-controls={bodyId}
-			aria-expanded={initiallyOpen}>×</button
-		>
-		<strong>{title}</strong>
+			aria-expanded={initiallyOpen}></button>
+		<strong class="title-text">{title}</strong>
+		<button class="zoom-btn" type="button" aria-label="Zoom" data-zoom></button>
 	</div>
 	<div class="window-body" data-body id={bodyId} aria-hidden={!initiallyOpen}>
 		<slot />
@@ -61,6 +61,7 @@ const initialStyle = floating
 		const root = document.currentScript.parentElement;
 		const titleBar = root.querySelector("[data-titlebar]");
 		const closeBtn = root.querySelector("[data-close]");
+		const zoomBtn = root.querySelector("[data-zoom]");
 		const body = root.querySelector("[data-body]");
 		const floating = root.getAttribute("data-floating") === "true";
 		let open = root.getAttribute("data-open") === "true";
@@ -188,6 +189,48 @@ const initialStyle = floating
 			renderOpen();
 		});
 
+		zoomBtn &&
+			zoomBtn.addEventListener("click", () => {
+				// naive zoom: toggle full width/height of parent
+				const parent = root.parentElement || document.body;
+				const pad = 8;
+				if (!root.__zoomed) {
+					root.__saved = {
+						left: root.style.left,
+						top: root.style.top,
+						width: root.style.width,
+						height: root.style.height,
+						transform: root.style.transform,
+						x: root.getAttribute("data-x"),
+						y: root.getAttribute("data-y"),
+					};
+					root.style.transform = "translate(0px,0px)";
+					root.setAttribute("data-x", "0");
+					root.setAttribute("data-y", "0");
+					root.style.left = pad + "px";
+					root.style.top = pad + "px";
+					root.style.width =
+						Math.max(280, (parent.clientWidth || window.innerWidth) - pad * 2) +
+						"px";
+					root.style.height =
+						Math.max(
+							140,
+							(parent.clientHeight || window.innerHeight) - pad * 2
+						) + "px";
+					root.__zoomed = true;
+				} else {
+					const s = root.__saved || {};
+					root.style.left = s.left || "";
+					root.style.top = s.top || "";
+					root.style.width = s.width || "";
+					root.style.height = s.height || "";
+					root.style.transform = s.transform || "";
+					if (s.x) root.setAttribute("data-x", s.x);
+					if (s.y) root.setAttribute("data-y", s.y);
+					root.__zoomed = false;
+				}
+			});
+
 		renderOpen();
 
 		if (floating) {
@@ -265,6 +308,120 @@ const initialStyle = floating
 	[data-floating="true"] .title-bar {
 		cursor: move;
 		user-select: none;
+	}
+
+	/* Classic 1-bit title tweaks */
+	.title-bar {
+		position: relative;
+		height: 18px;
+		padding: 0 var(--space-2);
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		background: repeating-linear-gradient(
+			45deg,
+			var(--gray-25) 0 1px,
+			var(--white) 1px 2px
+		);
+		border-bottom: var(--border);
+	}
+	.title-text {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		font-weight: 700;
+		white-space: nowrap;
+		pointer-events: none;
+		max-width: calc(100% - 48px);
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.close-btn,
+	.zoom-btn {
+		position: relative;
+		width: 11px;
+		height: 11px;
+		border: var(--border);
+		background: #fff;
+		box-shadow:
+			inset -1px -1px 0 0 var(--gray-75),
+			inset 1px 1px 0 0 var(--highlight);
+		padding: 0;
+		line-height: 0;
+		color: transparent;
+		flex-shrink: 0;
+	}
+	.close-btn:active,
+	.zoom-btn:active {
+		box-shadow:
+			inset 1px 1px 0 0 var(--gray-75),
+			inset -1px -1px 0 0 var(--highlight);
+	}
+	/* Pixelated X for close */
+	.close-btn::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 7px;
+		height: 7px;
+		transform: translate(-50%, -50%);
+		background: linear-gradient(
+				45deg,
+				transparent 3px,
+				#000 3px 4px,
+				transparent 4px
+			),
+			linear-gradient(-45deg, transparent 3px, #000 3px 4px, transparent 4px);
+		image-rendering: pixelated;
+	}
+	.zoom-btn::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 7px;
+		height: 7px;
+		transform: translate(-50%, -50%);
+		background:
+			linear-gradient(#000, #000) center/1px 7px no-repeat,
+			linear-gradient(#000, #000) center/7px 1px no-repeat;
+		image-rendering: pixelated;
+	}
+
+	/* Focus ring 1-bit */
+	.title-bar .close-btn:focus-visible,
+	.title-bar .zoom-btn:focus-visible {
+		outline: 1px dotted var(--black);
+		outline-offset: 0;
+	}
+
+	/* Active variant (if you toggle class externally) */
+	.window.active .title-bar {
+		background: repeating-linear-gradient(
+			45deg,
+			var(--gray-35) 0 1px,
+			var(--white) 1px 2px
+		);
+	}
+	.window:not(.active) .title-bar {
+		background: repeating-linear-gradient(
+			45deg,
+			var(--gray-10) 0 1px,
+			var(--white) 1px 2px
+		);
+	}
+	.window:not(.active) .title-text {
+		color: var(--gray-60);
+	}
+
+	/* Inner border for content */
+	.window-body::before {
+		content: "";
+		position: absolute;
+		inset: 4px;
+		border: 1px solid var(--black);
+		pointer-events: none;
 	}
 
 	/* Make sure close button doesn't interfere */

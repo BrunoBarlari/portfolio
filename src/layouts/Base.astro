@@ -53,8 +53,101 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 			defer></script>
 		<!-- Pre-initialize SFX manager and expose as window.__sfx -->
 		<script type="module">
-			import { getSfx } from '/src/lib/sfx.js';
-			try { window.__sfx = getSfx(); } catch {}
+			import { getSfx } from "/src/lib/sfx.js";
+			try {
+				window.__sfx = getSfx();
+			} catch {}
+		</script>
+		<!-- Global keyboard shortcuts: Cmd+W (close), Cmd+M (shade), Cmd+1/2/3 open windows -->
+		<script is:inline>
+			(function () {
+				function getFocusedWindowId() {
+					let focusedId = null;
+					try {
+						const wins = Array.from(
+							document.querySelectorAll(".window-component")
+						);
+						let maxZ = -Infinity,
+							maxEl = null;
+						for (const el of wins) {
+							if (el.style.display === "none") continue;
+							const z = parseInt(el.style.zIndex) || 0;
+							if (z > maxZ) {
+								maxZ = z;
+								maxEl = el;
+							}
+						}
+						focusedId = maxEl?.id || null;
+					} catch {}
+					return focusedId;
+				}
+
+				function dispatchWindowCommand(action, id) {
+					try {
+						window.dispatchEvent(
+							new CustomEvent("window-command", { detail: { action, id } })
+						);
+					} catch {}
+				}
+
+				window.addEventListener("keydown", (e) => {
+					// Ignore when typing in inputs/textareas/contenteditable
+					const t = e.target;
+					if (
+						t &&
+						(t.tagName === "INPUT" ||
+							t.tagName === "TEXTAREA" ||
+							t.isContentEditable)
+					)
+						return;
+
+					const meta = e.metaKey; // Cmd on macOS
+					if (!meta) return;
+
+					switch (e.key) {
+						case "w":
+							// Close focused window
+							e.preventDefault();
+							const idW = getFocusedWindowId();
+							if (idW) {
+								dispatchWindowCommand("close", idW);
+							} else {
+								try {
+									window.__sfx && window.__sfx.error && window.__sfx.error();
+								} catch {}
+							}
+							break;
+						case "m":
+							// Shade/unshade focused
+							e.preventDefault();
+							const idM = getFocusedWindowId();
+							if (idM) {
+								dispatchWindowCommand("shade", idM);
+							}
+							break;
+						case "1":
+							e.preventDefault();
+							try {
+								window.__windowManager?.setVisible("about-window", true);
+							} catch {}
+							break;
+						case "2":
+							e.preventDefault();
+							try {
+								window.__windowManager?.setVisible("projects-window", true);
+							} catch {}
+							break;
+						case "3":
+							e.preventDefault();
+							try {
+								window.__windowManager?.setVisible("contact-window", true);
+							} catch {}
+							break;
+						default:
+							break;
+					}
+				});
+			})();
 		</script>
 	</head>
 	<body>

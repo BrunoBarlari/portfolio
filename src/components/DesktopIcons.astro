@@ -55,6 +55,79 @@
 	(function () {
 		const layer = document.currentScript.parentElement;
 		const icons = Array.from(layer.querySelectorAll(".desktop-icon"));
+		const LS = "desktopIconPositions";
+		const grid = { cellW: 84, cellH: 96, padX: 12, padY: 12, gapY: 12 };
+
+		function snap(pos) {
+			const x = Math.max(
+				0,
+				Math.round((pos.x - grid.padX) / grid.cellW) * grid.cellW + grid.padX
+			);
+			const y = Math.max(
+				0,
+				Math.round((pos.y - grid.padY) / grid.cellH) * grid.cellH + grid.padY
+			);
+			return { x, y };
+		}
+		function setPos(el, x, y) {
+			el.style.left = x + "px";
+			el.style.top = y + "px";
+		}
+		function getPos(el) {
+			return {
+				x: parseInt(el.style.left) || 0,
+				y: parseInt(el.style.top) || 0,
+			};
+		}
+		function save() {
+			const data = {};
+			icons.forEach((i) => {
+				const id = i.getAttribute("data-icon-id");
+				data[id] = getPos(i);
+			});
+			try {
+				localStorage.setItem(LS, JSON.stringify(data));
+			} catch {}
+		}
+		function load() {
+			try {
+				const raw = localStorage.getItem(LS);
+				if (!raw) return;
+				const data = JSON.parse(raw);
+				icons.forEach((i) => {
+					const id = i.getAttribute("data-icon-id");
+					if (data[id]) setPos(i, data[id].x, data[id].y);
+				});
+			} catch {}
+		}
+		function arrangeByName() {
+			const sorted = icons.slice().sort((a, b) => {
+				const ta = a.querySelector(".icon-label")?.textContent || "";
+				const tb = b.querySelector(".icon-label")?.textContent || "";
+				return ta.localeCompare(tb);
+			});
+			let col = 0,
+				row = 0;
+			sorted.forEach((el, idx) => {
+				const x = grid.padX + col * grid.cellW;
+				const y = grid.padY + row * grid.cellH;
+				setPos(el, x, y);
+				row++;
+				if (y + grid.cellH * 2 > (layer.parentElement?.clientHeight || 600)) {
+					row = 0;
+					col++;
+				}
+			});
+			save();
+		}
+		function cleanUp() {
+			icons.forEach((el) => {
+				const p = getPos(el);
+				const s = snap(p);
+				setPos(el, s.x, s.y);
+			});
+			save();
+		}
 
 		function selectIcon(el) {
 			icons.forEach((i) => i.classList.toggle("selected", i === el));
@@ -107,6 +180,12 @@
 				if (!t.closest(".desktop-icon")) clearSelection();
 			});
 		}
+
+		// Init from storage
+		load();
+		// Desktop commands
+		window.addEventListener("desktop-arrange-by-name", arrangeByName);
+		window.addEventListener("desktop-clean-up", cleanUp);
 	})();
 </script>
 

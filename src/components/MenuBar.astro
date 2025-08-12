@@ -27,6 +27,16 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 				>
 			</li>
 			<li class="menu-item">
+				<button type="button" role="menuitem" data-open-control-panels>
+					Control Panels
+				</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem" data-open-chooser>
+					Chooser…
+				</button>
+			</li>
+			<li class="menu-item">
 				<hr
 					aria-hidden="true"
 					style="border:0; border-top:1px solid #000; margin:2px 0;"
@@ -36,6 +46,9 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 				<button type="button" role="menuitem" data-open-about
 					>About This Site…</button
 				>
+			</li>
+			<li class="menu-item" aria-disabled="true">
+				<button type="button" role="menuitem" disabled>Sleep</button>
 			</li>
 		</ul>
 	</div>
@@ -194,10 +207,20 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 				<button type="button" role="menuitem" disabled>Empty Trash</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Restart…</button>
+				<button type="button" role="menuitem" data-clean-up
+					>Clean Up Desktop</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Shut Down…</button>
+				<button type="button" role="menuitem" data-arrange-by-name
+					>Arrange by Name</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem" data-open-restart
+					>Restart…</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem" data-open-shutdown
+					>Shut Down…</button>
 			</li>
 		</ul>
 	</div>
@@ -205,7 +228,10 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 	<div style="flex:1"></div>
 	<div class="clock" aria-live="polite" data-clock>00:00</div>
 	<!-- SFX toggle -->
-	<div class="no-print" style="display:flex;align-items:center;gap:8px;margin-left:8px;">
+	<div
+		class="no-print"
+		style="display:flex;align-items:center;gap:8px;margin-left:8px;"
+	>
 		<ToggleRetro />
 	</div>
 	<button
@@ -310,12 +336,24 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		function openAboutMac() {
 			openById("about-mac-window");
 		}
+		function openControlPanels() {
+			openById("control-panels-window");
+		}
+		function openChooser() {
+			openById("chooser-window");
+		}
 
 		root.querySelectorAll("[data-open-about]").forEach((el) => {
 			el.addEventListener("click", openAbout);
 		});
 		root.querySelectorAll("[data-open-about-mac]").forEach((el) => {
 			el.addEventListener("click", openAboutMac);
+		});
+		root.querySelectorAll("[data-open-control-panels]").forEach((el) => {
+			el.addEventListener("click", openControlPanels);
+		});
+		root.querySelectorAll("[data-open-chooser]").forEach((el) => {
+			el.addEventListener("click", openChooser);
 		});
 
 		function updateClock() {
@@ -334,12 +372,58 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		root.addEventListener("pointerdown", (e) => {
 			const t = e.target;
 			if (!(t instanceof Element)) return;
-			const disabledItem = t.closest(".menu-item[aria-disabled=\"true\"]");
+			const disabledItem = t.closest('.menu-item[aria-disabled="true"]');
 			if (disabledItem) {
-				import('/src/lib/sfx.js')
+				import("/src/lib/sfx.js")
 					.then((m) => m.getSfx && m.getSfx())
 					.then((s) => s && s.error && s.error())
 					.catch(() => {});
+			}
+		});
+
+		// Special menu: Empty Trash action
+		root.addEventListener("click", (e) => {
+			const t = e.target;
+			if (!(t instanceof Element)) return;
+			const item = t.closest(".menu-item");
+			if (!item) return;
+			if (
+				item.textContent &&
+				item.textContent.trim().startsWith("Empty Trash")
+			) {
+				try {
+					const trash = document.getElementById("trash-window");
+					if (trash && trash.style.display !== "none") {
+						const body = trash.querySelector(".window-body .trash-content");
+						if (body)
+							body.innerHTML =
+								'<p class="text-sm opacity-80">The Trash is empty.</p>';
+					}
+				} catch {}
+				import("/src/lib/sfx.js")
+					.then((m) => m.getSfx && m.getSfx())
+					.then((s) => s && s.close && s.close())
+					.catch(() => {});
+			}
+
+			// Dispatch desktop actions
+			if (t.closest("[data-clean-up]")) {
+				try {
+					window.dispatchEvent(new CustomEvent("desktop-clean-up"));
+				} catch {}
+			}
+			if (t.closest("[data-arrange-by-name]")) {
+				try {
+					window.dispatchEvent(new CustomEvent("desktop-arrange-by-name"));
+				} catch {}
+			}
+
+			// Open Restart / Shut Down dialogs
+			if (t.closest("[data-open-restart]")) {
+				openById("restart-window");
+			}
+			if (t.closest("[data-open-shutdown]")) {
+				openById("shutdown-window");
 			}
 		});
 	})();

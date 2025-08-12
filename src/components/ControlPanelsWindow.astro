@@ -1,0 +1,70 @@
+---
+import WindowBase from "./WindowBase.astro";
+---
+
+<WindowBase
+	title="Control Panels"
+	x={120}
+	y={100}
+	width={300}
+	height={220}
+	zIndex={12}
+	windowId="control-panels-window"
+	initiallyVisible={false}
+>
+	<div class="cp-grid">
+		<div class="cp-item">
+			<div class="cp-icon" aria-hidden="true">🔊</div>
+			<div class="cp-label">Sound</div>
+			<div class="cp-control">
+				<label class="toggle">
+					<input type="checkbox" data-sfx-toggle />
+					<span>Enable SFX</span>
+				</label>
+			</div>
+		</div>
+	</div>
+</WindowBase>
+
+<script is:inline>
+	(function () {
+		const root = document.currentScript.parentElement;
+		const toggle = root.querySelector("[data-sfx-toggle]");
+		function init() {
+			import("/src/lib/sfx.js")
+				.then((m) => m.getSfx && m.getSfx())
+				.then((s) => {
+					if (!s) return;
+					toggle.checked = !!s.enabled;
+					toggle.addEventListener("change", () => s.setEnabled(toggle.checked));
+				})
+				.catch(() => {});
+		}
+		init();
+	})();
+</script>
+
+<style is:inline>
+	.cp-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 8px;
+	}
+	.cp-item {
+		border: var(--border);
+		padding: 6px;
+		background: #fff;
+	}
+	.cp-icon {
+		font-size: 18px;
+	}
+	.toggle {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: var(--fs-10);
+	}
+	input[type="checkbox"] {
+		accent-color: #000;
+	}
+</style>
