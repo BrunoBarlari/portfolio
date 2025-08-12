@@ -1,0 +1,231 @@
+---
+/** WindowBase: Base component for all draggable windows */
+interface Props {
+	title: string;
+	x?: number;
+	y?: number;
+	width?: number;
+	height?: number;
+	zIndex?: number;
+	windowId: string;
+}
+
+const {
+	title,
+	x = 20,
+	y = 20,
+	width = 400,
+	height = 300,
+	zIndex = 10,
+	windowId,
+} = Astro.props as Props;
+---
+
+<div
+	class="window-component resize-drag"
+	id={windowId}
+	style={`left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; z-index: ${zIndex};`}
+	data-x="0"
+	data-y="0"
+>
+	<div class="window-frame">
+		<div class="window-titlebar" data-drag-handle>
+			<button class="window-close-btn" type="button" aria-label="Cerrar"
+				>×</button
+			>
+			<span class="window-title-text">{title}</span>
+		</div>
+		<div class="window-body">
+			<slot />
+		</div>
+	</div>
+	<div class="window-resize-handle"></div>
+</div>
+
+<script is:inline define:vars={{ windowId }}>
+	(function () {
+		const windowEl = document.getElementById(windowId);
+		const titleBar = windowEl.querySelector("[data-drag-handle]");
+		const closeBtn = windowEl.querySelector(".window-close-btn");
+
+		// Bring window to front
+		function bringToFront() {
+			const allWindows = document.querySelectorAll(".window-component");
+			let maxZ = 10;
+			allWindows.forEach((w) => {
+				const z = parseInt(w.style.zIndex) || 10;
+				if (z > maxZ) maxZ = z;
+			});
+			windowEl.style.zIndex = (maxZ + 1).toString();
+		}
+
+		// Initialize Interact.js following the exact documentation pattern
+		function initInteract() {
+			if (!window.interact) return;
+
+			const interact = window.interact;
+
+			// Instancia por ventana (evita re-configurar todas cada vez)
+			const i = interact(windowEl);
+
+			// Resize sólo desde derecha e inferior para no interferir con el title bar
+			i.resizable({
+				edges: { left: false, right: true, bottom: true, top: false },
+				listeners: {
+					move(event) {
+						var target = event.target;
+						var x = parseFloat(target.getAttribute("data-x")) || 0;
+						var y = parseFloat(target.getAttribute("data-y")) || 0;
+						target.style.width = event.rect.width + "px";
+						target.style.height = event.rect.height + "px";
+						// left/top deltas sólo relevantes si esos edges activos (no lo están, pero dejamos por consistencia)
+						x += event.deltaRect.left;
+						y += event.deltaRect.top;
+						target.style.transform = `translate(${x}px, ${y}px)`;
+						target.setAttribute("data-x", x);
+						target.setAttribute("data-y", y);
+					},
+				},
+				modifiers: [
+					interact.modifiers.restrictEdges({ outer: "parent" }),
+					interact.modifiers.restrictSize({ min: { width: 280, height: 140 } }),
+				],
+				inertia: true,
+			});
+
+			// Drag sólo sobre la barra de título moviendo la ventana completa
+			interact(titleBar).draggable({
+				ignoreFrom: ".window-close-btn",
+				listeners: {
+					start() {
+						bringToFront();
+						titleBar.style.cursor = "grabbing";
+					},
+					move(e) {
+						const x = (parseFloat(windowEl.getAttribute("data-x")) || 0) + e.dx;
+						const y = (parseFloat(windowEl.getAttribute("data-y")) || 0) + e.dy;
+						windowEl.style.transform = `translate(${x}px, ${y}px)`;
+						windowEl.setAttribute("data-x", x);
+						windowEl.setAttribute("data-y", y);
+					},
+					end() {
+						titleBar.style.cursor = "move";
+					},
+				},
+				inertia: true,
+				modifiers: [
+					interact.modifiers.restrictRect({
+						restriction: "parent",
+						endOnly: true,
+					}),
+				],
+			});
+		}
+
+		// Close button functionality
+		closeBtn.addEventListener("click", () => {
+			windowEl.style.display =
+				windowEl.style.display === "none" ? "block" : "none";
+		});
+
+		// Click to bring to front
+		windowEl.addEventListener("mousedown", bringToFront);
+
+		// Initialize when Interact.js is ready
+		if (window.interact) {
+			initInteract();
+		} else {
+			window.addEventListener("load", () => {
+				if (window.interact) {
+					initInteract();
+				}
+			});
+		}
+	})();
+</script>
+
+<style is:inline>
+	.window-component {
+		position: absolute;
+		background: var(--white);
+		border: var(--border);
+		border-radius: 0;
+		box-shadow: none;
+		min-width: 280px;
+		min-height: 140px;
+		user-select: none;
+	}
+
+	.window-frame {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.window-titlebar {
+		height: 18px;
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: 0 var(--space-2);
+		font-size: var(--fs-12);
+		font-weight: 700;
+		background: repeating-linear-gradient(
+			45deg,
+			var(--gray-25) 0 1px,
+			var(--white) 1px 2px
+		);
+		border-bottom: var(--border);
+		cursor: move;
+		user-select: none;
+	}
+
+	.window-close-btn {
+		width: 11px;
+		height: 11px;
+		border: var(--border);
+		background: var(--white);
+		padding: 0;
+		line-height: 0;
+		color: transparent;
+		box-shadow:
+			inset -1px -1px 0 0 var(--gray-75),
+			inset 1px 1px 0 0 var(--highlight);
+		cursor: pointer;
+		flex-shrink: 0;
+	}
+
+	.window-title-text {
+		flex: 1;
+		font-weight: 700;
+		pointer-events: none;
+	}
+
+	.window-body {
+		flex: 1;
+		padding: var(--space-4);
+		font-size: var(--fs-10);
+		line-height: var(--lh-ui);
+		overflow: auto;
+	}
+
+	.window-resize-handle {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		width: 12px;
+		height: 12px;
+		cursor: nw-resize;
+		background: linear-gradient(135deg, transparent 50%, var(--gray-75) 50%);
+		pointer-events: all;
+	}
+
+	@media (max-width: 768px) {
+		.window-titlebar {
+			cursor: default;
+		}
+		.window-resize-handle {
+			display: none;
+		}
+	}
+</style>
