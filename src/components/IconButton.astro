@@ -6,7 +6,7 @@ interface Props {
 	href?: string;
 	size?: number;
 }
-const { src, alt, href = "#", size = 24 } = Astro.props as Props;
+const { src, alt, href = "#", size = 32 } = Astro.props as Props;
 const base = (import.meta as any).env?.BASE_URL || "/";
 const resolvedSrc = src.startsWith("/") ? base + src.slice(1) : src;
 ---

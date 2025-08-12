@@ -18,7 +18,7 @@ const icons = [
 				data-window-id={i.id}
 				aria-label={`Abrir ${i.label}`}
 			>
-				<img src={i.src} alt="" width="20" height="20" />
+				<img src={i.src} alt="" width="32" height="32" />
 			</button>
 		))
 	}
@@ -86,13 +86,13 @@ const icons = [
 		right: 8px;
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: 10px;
 		z-index: 5; /* behind windows (>=10), above background (1) */
 		pointer-events: auto;
 	}
 	.dock-item {
-		width: 28px;
-		height: 28px;
+		width: 44px;
+		height: 44px;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -111,23 +111,23 @@ const icons = [
 	}
 	.dock-item img {
 		image-rendering: pixelated;
-		width: 20px;
-		height: 20px;
+		width: 32px;
+		height: 32px;
 	}
 
 	@media (max-width: 768px) {
 		.window-dock {
 			top: calc(var(--menubar-height) + 4px);
 			right: 4px;
-			gap: 6px;
+			gap: 8px;
 		}
 		.dock-item {
-			width: 26px;
-			height: 26px;
+			width: 36px;
+			height: 36px;
 		}
 		.dock-item img {
-			width: 18px;
-			height: 18px;
+			width: 28px;
+			height: 28px;
 		}
 	}
 </style>
