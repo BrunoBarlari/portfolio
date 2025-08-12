@@ -8,6 +8,7 @@ interface Props {
 	height?: number;
 	zIndex?: number;
 	windowId: string;
+	initiallyVisible?: boolean;
 }
 
 const {
@@ -18,13 +19,14 @@ const {
 	height = 300,
 	zIndex = 10,
 	windowId,
+	initiallyVisible = true,
 } = Astro.props as Props;
 ---
 
 <div
 	class="window-component resize-drag"
 	id={windowId}
-	style={`left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; z-index: ${zIndex};`}
+	style={`left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; z-index: ${zIndex};${initiallyVisible ? '' : ' display:none;'}`}
 	data-x="0"
 	data-y="0"
 >
@@ -34,6 +36,7 @@ const {
 				>×</button
 			>
 			<span class="window-title-text">{title}</span>
+			<button class="window-zoom-btn" type="button" aria-label="Zoom" />
 		</div>
 		<div class="window-body">
 			<slot />
@@ -47,6 +50,7 @@ const {
 		const windowEl = document.getElementById(windowId);
 		const titleBar = windowEl.querySelector("[data-drag-handle]");
 		const closeBtn = windowEl.querySelector(".window-close-btn");
+		const zoomBtn = windowEl.querySelector(".window-zoom-btn");
 
 		function emitFocused() {
 			try {
@@ -99,7 +103,13 @@ const {
 		}
 		const manager = ensureManager();
 
-		// Bring window to front
+		// Helpers
+		function getCanvas() {
+			let el = windowEl.parentElement;
+			while (el && !el.hasAttribute("data-desktop-canvas")) el = el.parentElement;
+			return el || document.body;
+		}
+
 		function bringToFront() {
 			const allWindows = document.querySelectorAll(".window-component");
 			let maxZ = 10;
@@ -110,6 +120,49 @@ const {
 			windowEl.style.zIndex = (maxZ + 1).toString();
 			emitFocused();
 		}
+
+		// Zoom behavior (toggle between saved rect and fit-to-canvas)
+		let savedRect = null;
+		let zoomed = false;
+		function doZoomToggle() {
+			const canvas = getCanvas();
+			if (!zoomed) {
+				// Save current geometry (including transform offsets)
+				const rect = {
+					left: parseFloat(windowEl.style.left) || 0,
+					top: parseFloat(windowEl.style.top) || 0,
+					width: parseFloat(windowEl.style.width) || windowEl.offsetWidth,
+					height: parseFloat(windowEl.style.height) || windowEl.offsetHeight,
+					x: parseFloat(windowEl.getAttribute("data-x")) || 0,
+					y: parseFloat(windowEl.getAttribute("data-y")) || 0,
+				};
+				savedRect = rect;
+				// Reset transform and expand to canvas with small padding
+				windowEl.style.transform = "translate(0px, 0px)";
+				windowEl.setAttribute("data-x", "0");
+				windowEl.setAttribute("data-y", "0");
+				const pad = 8;
+				const cw = canvas.clientWidth;
+				const ch = canvas.clientHeight;
+				windowEl.style.left = pad + "px";
+				windowEl.style.top = pad + "px";
+				windowEl.style.width = Math.max(280, cw - pad * 2) + "px";
+				windowEl.style.height = Math.max(140, ch - pad * 2) + "px";
+				zoomed = true;
+				bringToFront();
+			} else if (savedRect) {
+				windowEl.style.left = savedRect.left + "px";
+				windowEl.style.top = savedRect.top + "px";
+				windowEl.style.width = savedRect.width + "px";
+				windowEl.style.height = savedRect.height + "px";
+				windowEl.style.transform = `translate(${savedRect.x}px, ${savedRect.y}px)`;
+				windowEl.setAttribute("data-x", String(savedRect.x));
+				windowEl.setAttribute("data-y", String(savedRect.y));
+				zoomed = false;
+				bringToFront();
+			}
+		}
+		zoomBtn.addEventListener("click", doZoomToggle);
 
 		// Initialize Interact.js following the exact documentation pattern
 		function initInteract() {
@@ -197,7 +250,7 @@ const {
 		// Click to bring to front
 		windowEl.addEventListener("mousedown", bringToFront);
 
-		// Register initial visibility as true
+		// Register initial visibility
 		manager.register(windowId, windowEl.style.display !== "none");
 		// Emit focused for the first visible window (best-effort)
 		if (windowEl.style.display !== "none") {
@@ -251,7 +304,7 @@ const {
 		border-bottom: var(--border);
 		cursor: move;
 		user-select: none;
-		position: relative; /* necesario para centrar absoluto */
+		position: relative;
 	}
 
 	.window-close-btn {
@@ -278,6 +331,21 @@ const {
 		pointer-events: none;
 		white-space: nowrap;
 		text-align: center;
+	}
+
+	.window-zoom-btn{
+		position: absolute;
+		right: 2px;
+		top: 2px;
+		width: 11px; height: 11px;
+		border: var(--border);
+		background: var(--white);
+		box-shadow: inset -1px -1px 0 0 var(--gray-75), inset 1px 1px 0 0 var(--highlight);
+		padding:0; line-height:0; color:transparent;
+		cursor: pointer;
+	}
+	.window-zoom-btn:active{
+		box-shadow: inset 1px 1px 0 0 var(--gray-75), inset -1px -1px 0 0 var(--highlight);
 	}
 
 	.window-body {
