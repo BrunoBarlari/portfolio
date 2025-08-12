@@ -97,6 +97,8 @@ import { projects } from "../data/projects";
 		grid-template-columns: repeat(4, 1fr);
 		gap: 18px 12px;
 		align-items: start;
+		justify-items: center; /* center buttons within each cell */
+		padding-top: 6px; /* keep first row clear of any overlap/cropping */
 	}
 	@media (max-width: 640px) {
 		.icon-grid {
