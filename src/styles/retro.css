@@ -185,7 +185,7 @@ a:hover, a:focus-visible { text-decoration: underline; }
 .clock { margin-left:auto; font-variant-numeric:tabular-nums; }
 .menubar .clock{ color: var(--black) !important; font-size: inherit; }
 
-.window { box-shadow: 0 6px 14px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; will-change: transform, opacity, box-shadow; animation: winIn 220ms var(--anim-ease) both; transition: box-shadow 160ms var(--anim-ease), transform 160ms var(--anim-ease); }
+/* Window { box-shadow: 0 6px 14px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; will-change: transform, opacity, box-shadow; animation: winIn 220ms var(--anim-ease) both; transition: box-shadow 160ms var(--anim-ease), transform 160ms var(--anim-ease); } */
 .title-bar { display:flex; align-items:center; gap:.5rem; background:
   repeating-linear-gradient(
     -45deg,
@@ -296,7 +296,7 @@ html,body{ font-family: var(--font-ui); font-size: var(--fs-10); line-height: va
 .menubar .clock{ color: var(--black) !important; font-size: inherit; }
 
 /* --- Fixed desktop (no page scroll) --- */
-:root{ --menubar-height: 24px; }
+:root{ --menubar-height: 28px; }
 html, body { 
   height: 100dvh; 
   overflow: hidden; 
@@ -383,3 +383,6 @@ html, body {
   color: var(--white) !important;
   border: 0 !important;
 }
+
+/* Larger clock to match taller menubar */
+.menubar .clock { font-size: var(--fs-14) !important; }

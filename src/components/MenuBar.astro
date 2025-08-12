@@ -44,11 +44,34 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 			</li>
 			<li class="menu-item">
 				<button type="button" role="menuitem" data-action="hide-others"
-					>Hide Others</button>
+					>Hide Others</button
+				>
 			</li>
 			<li class="menu-item">
 				<button type="button" role="menuitem" data-action="show-all"
-					>Show All</button>
+					>Show All</button
+				>
+			</li>
+		</ul>
+	</div>
+
+	<!-- File menu (new) -->
+	<div class="menu-root" data-menu data-menu-id="file">
+		<button
+			class="menu-button"
+			type="button"
+			aria-haspopup="true"
+			aria-expanded="false">File</button
+		>
+		<ul class="menu-list" role="menu" aria-label="File menu">
+			<li class="menu-item">
+				<button type="button" role="menuitem">New</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Open…</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Close</button>
 			</li>
 		</ul>
 	</div>
@@ -110,8 +133,8 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		<img
 			src={base + "icons/apple.svg"}
 			alt=""
-			width="20"
-			height="20"
+			width="22"
+			height="22"
 			style="image-rendering:pixelated;"
 		/>
 	</button>
