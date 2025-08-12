@@ -2,9 +2,10 @@
 /** Desktop: Fixed desktop environment background */
 import WindowDock from "./WindowDock.astro";
 import DesktopIcons from "./DesktopIcons.astro";
+const base = (import.meta as any).env?.BASE_URL || "/";
 ---
 
-<div class="desktop-background" data-desktop-canvas>
+<div class="desktop-background" data-desktop-canvas style={`--desktop-bg: url('${base}image.png')`}>
 	<DesktopIcons />
 	<slot />
 	<WindowDock />
@@ -17,15 +18,12 @@ import DesktopIcons from "./DesktopIcons.astro";
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: var(--gray-10);
-		overflow: hidden;
-		/* Mac desktop pattern */
-		background-image: radial-gradient(
-			circle at 2px 2px,
-			rgba(0, 0, 0, 0.1) 1px,
-			transparent 0
-		);
-		background-size: 20px 20px;
+		background-color: var(--gray-10);
+		/* Fondo: imagen provista */
+		background-image: var(--desktop-bg);
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: cover;
 		/* IMPORTANTE: permitir eventos para que las ventanas (hijas) puedan recibir drag */
 		pointer-events: auto;
 		user-select: none;
