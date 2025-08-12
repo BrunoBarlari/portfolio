@@ -1,6 +1,7 @@
 ---
 import WindowBase from "./WindowBase.astro";
 import { profile } from "../data/profile";
+import Divider from "./Divider.astro";
 
 const githubLabel = profile.links.github
 	? "@" + profile.links.github.split("/").filter(Boolean).pop()
@@ -23,7 +24,7 @@ try {
 	x={24}
 	y={40}
 	width={520}
-	height={300}
+	height={560}
 	zIndex={11}
 	windowId="about-window"
 >
@@ -52,6 +53,69 @@ try {
 			<a href={profile.links.email} class="btn-link">{profile.contactEmail}</a>
 		</p>
 
+		<Divider />
+		<div class="guide-subtitle">Experiencia Laboral</div>
+		<ul class="guide-list">
+			<li>
+				<strong>Warner Bros. Discovery – Desarrollador Backend</strong>
+				<div class="guide-meta">Buenos Aires, Argentina · julio 2024 – presente</div>
+				<ul class="guide-list nested">
+					<li>Microservicios en Java y Spring Boot (CI/CD).</li>
+					<li>Pruebas automatizadas con JUnit y Mockito (&gt;80% cobertura).</li>
+					<li>Optimización de consultas en MongoDB.</li>
+					<li>APIs orientadas a eventos con AWS Lambda (Python).</li>
+					<li>Documentación en Jira y Confluence.</li>
+					<li>Participación en el lanzamiento de Max en Asia (Taiwán, Hong Kong).</li>
+					<li>Colaboración con equipos internacionales (Europa y Asia).</li>
+					<li>Metodología Scrum (sprints con Devs, QA y POs).</li>
+				</ul>
+			</li>
+			<li>
+				<strong>Self-employed – Desarrollador de software</strong>
+				<div class="guide-meta">Provincia de Buenos Aires, Argentina · dic 2022 – nov 2023</div>
+				<ul class="guide-list nested">
+					<li>Sistema integral de gestión contable y fiscal.</li>
+					<li>Automatización de tareas, reducción de errores y visibilidad financiera.</li>
+				</ul>
+			</li>
+		</ul>
+
+		<Divider />
+		<div class="guide-subtitle">Educación</div>
+		<ul class="guide-list">
+			<li>
+				<strong>UTN (FRBA)</strong> – Ingeniería en Sistemas de Información
+				<div class="guide-meta">mar 2023 – dic 2027</div>
+			</li>
+			<li>
+				<strong>Instituto San Agustín</strong> – Bachiller en Economía y Administración (portugués)
+				<div class="guide-meta">2017 – 2022</div>
+			</li>
+		</ul>
+
+		<Divider />
+		<div class="guide-subtitle">Idiomas</div>
+		<ul class="guide-list">
+			<li>Español: Nativo</li>
+			<li>Inglés: Avanzado (C1 – EF SET 66/100; FCE - B2)</li>
+			<li>Portugués: Intermedio (B1)</li>
+		</ul>
+
+		<Divider />
+		<div class="guide-subtitle">Certificaciones</div>
+		<ul class="guide-list">
+			<li>JavaScript Algorithms and Data Structures</li>
+			<li>First Certificate in English - B2</li>
+			<li>EF SET English Certificate 66/100 (C1 Advanced)</li>
+		</ul>
+
+		<Divider />
+		<div class="guide-subtitle">Otras actividades</div>
+		<ul class="guide-list">
+			<li>Grupo Scout San José Obrero – Distrito 2 Zona 43 – Scouts Argentina</li>
+			<li>Proyecto “Manos a la Obra” – Proyecto solidario universitario</li>
+		</ul>
+
 		<div class="guide-pager" aria-label="Pager">
 			<button class="pager-btn" type="button" aria-label="Anterior" disabled>◀</button>
 			<span class="pager-index" aria-live="polite">1</span>
@@ -68,4 +132,7 @@ try {
 	.pager-btn { width: 18px; height: 18px; border: 1px solid var(--black); background:#fff; line-height: 14px; padding:0; }
 	.pager-btn[disabled] { opacity: .6; }
 	.pager-index { display:inline-block; min-width: 18px; text-align: center; border:1px solid var(--black); }
+	.guide-subtitle { font-weight: 700; margin: 6px 0 2px; }
+	.guide-meta { font-size: var(--fs-9); opacity: .85; }
+	.guide-list.nested { margin-top: 4px; }
 </style>
