@@ -225,7 +225,14 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		const root = document.currentScript.parentElement;
 		const menus = Array.from(root.querySelectorAll("[data-menu]"));
 		let openMenu = null;
+		let closeTimer = null;
 
+		function clearCloseTimer() {
+			if (closeTimer) {
+				clearTimeout(closeTimer);
+				closeTimer = null;
+			}
+		}
 		function closeAll() {
 			menus.forEach((r) => {
 				r.classList.remove("open");
@@ -243,26 +250,26 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 
 		menus.forEach((r) => {
 			const btn = r.querySelector("button.menu-button");
-			btn.addEventListener("click", () => {
-				const isOpen = r.classList.contains("open");
-				closeAll();
-				if (!isOpen) open(r);
-			});
-			// close when leaving hover over that menu
-			r.addEventListener("mouseleave", () => {
-				if (r.classList.contains("open")) closeAll();
-			});
-			// if another menu is open, hovering this one switches
+			// Abrir al hacer hover; cancelar timers de cierre
 			r.addEventListener("mouseenter", () => {
-				if (openMenu && openMenu !== r) {
+				clearCloseTimer();
+				closeAll();
+				open(r);
+			});
+			// Cerrar con pequeño delay para evitar flicker al moverse entre menús
+			r.addEventListener("mouseleave", () => {
+				clearCloseTimer();
+				closeTimer = setTimeout(() => {
 					closeAll();
-					open(r);
-				}
+				}, 160);
 			});
 		});
 
 		document.addEventListener("click", (e) => {
-			if (!root.contains(e.target)) closeAll();
+			if (!root.contains(e.target)) {
+				clearCloseTimer();
+				closeAll();
+			}
 		});
 
 		// Update active app name when a window is focused
@@ -316,37 +323,7 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		updateClock();
 		setInterval(updateClock, 60 * 1000);
 
-		// Press-and-hold behavior (System 7 style)
-		let tracking = false;
-		root.addEventListener("mousedown", (e) => {
-			const t = e.target;
-			if (!(t instanceof Element)) return;
-			const btn = t.closest(".menu-button");
-			if (!btn) return;
-			const r = btn.closest("[data-menu]");
-			if (!r) return;
-			closeAll();
-			open(r);
-			tracking = true;
-			e.preventDefault();
-		});
-
-		document.addEventListener("mouseup", (e) => {
-			if (!tracking) return;
-			tracking = false;
-			const t = e.target;
-			if (t instanceof Element) {
-				const action = t.closest(".menu-item > button, .menu-item > a");
-				if (action) {
-					if (typeof action.click === "function") {
-						action.click();
-					} else {
-						action.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-					}
-				}
-			}
-			closeAll();
-		});
+		// Eliminado: comportamiento de "press-and-hold"; ahora sólo hover abre/cierra
 	})();
 </script>
 <style is:inline>
