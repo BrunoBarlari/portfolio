@@ -12,37 +12,35 @@ import { projects } from "../data/projects";
 	zIndex={14}
 	windowId="projects-window"
 >
-	<div id="projects" class="projects-list">
-		{
-			projects.map((p) => (
-				<article class="project">
-					<h3 class="project-title">
-						{p.title} {p.year && <small class="year">· {p.year}</small>}
-					</h3>
-					<p class="project-summary">{p.summary}</p>
-					{p.tech && <p class="project-tech">{p.tech.join(" · ")}</p>}
-					{p.links && p.links.length > 0 && (
-						<p class="project-links">
-							{p.links
-								.map((l) => (
-									<a
-										href={l.url}
-										class="btn-link"
-										rel="noopener noreferrer"
-										target={l.url.startsWith("http") ? "_blank" : undefined}
-									>
-										{l.label}
-									</a>
-								))
-								.reduce(
-									(acc, el, i, arr) =>
-										acc.concat(el, i < arr.length - 1 ? " · " : ""),
-									[]
-								)}
-						</p>
+	<div id="projects" class="guide">
+		<div class="guide-title">Projects</div>
+		<ul class="guide-list">
+			{projects.map((p) => (
+				<li>
+					<strong>{p.title}</strong>{" "}
+					{p.year && <small class="opacity-80">· {p.year}</small>}
+					{p.summary && <div class="text-sm">{p.summary}</div>}
+					{p.tech && p.tech.length > 0 && (
+						<div class="text-sm opacity-80">{p.tech.join(" · ")}</div>
 					)}
-				</article>
-			))
-		}
+				</li>
+			))}
+		</ul>
+
+		<div class="guide-pager" aria-label="Pager">
+			<button class="pager-btn" type="button" aria-label="Anterior" disabled>◀</button>
+			<span class="pager-index" aria-live="polite">1</span>
+			<button class="pager-btn" type="button" aria-label="Siguiente" disabled>▶</button>
+		</div>
 	</div>
 </WindowBase>
+
+<style is:inline>
+	.guide { font-size: var(--fs-10); line-height: 1.35; }
+	.guide-title { font-weight: 700; margin-bottom: 6px; }
+	.guide-list { list-style: disc; padding-left: 1.1rem; margin: 8px 0; display: grid; gap: 6px; }
+	.guide-pager { display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; }
+	.pager-btn { width: 18px; height: 18px; border: 1px solid var(--black); background:#fff; line-height: 14px; padding:0; }
+	.pager-btn[disabled] { opacity: .6; }
+	.pager-index { display:inline-block; min-width: 18px; text-align: center; border:1px solid var(--black); }
+</style>

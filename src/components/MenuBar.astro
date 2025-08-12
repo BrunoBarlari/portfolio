@@ -26,7 +26,10 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 				>
 			</li>
 			<li class="menu-item">
-				<hr aria-hidden="true" style="border:0; border-top:1px solid #000; margin:2px 0;" />
+				<hr
+					aria-hidden="true"
+					style="border:0; border-top:1px solid #000; margin:2px 0;"
+				/>
 			</li>
 			<li class="menu-item">
 				<button type="button" role="menuitem" data-open-about
@@ -289,8 +292,12 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 				);
 			} catch {}
 		}
-		function openAbout() { openById("about-window"); }
-		function openAboutMac() { openById("about-mac-window"); }
+		function openAbout() {
+			openById("about-window");
+		}
+		function openAboutMac() {
+			openById("about-mac-window");
+		}
 
 		root.querySelectorAll("[data-open-about]").forEach((el) => {
 			el.addEventListener("click", openAbout);

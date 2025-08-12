@@ -3,24 +3,48 @@
 ---
 
 <div class="desktop-icons-layer" aria-label="Desktop Icons">
-	<button class="desktop-icon" data-icon-id="harddisk" style="left:12px; top:12px;">
+	<button
+		class="desktop-icon"
+		data-icon-id="harddisk"
+		style="left:12px; top:12px;"
+	>
 		<span class="icon-svg" aria-hidden="true">
-			<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-				<rect x="3" y="8" width="26" height="16" stroke="#000" fill="#FFF" />
-				<rect x="5" y="10" width="22" height="8" fill="#000" />
-				<rect x="24" y="20" width="3" height="2" fill="#000" />
+			<svg
+				width="32"
+				height="32"
+				viewBox="0 0 32 32"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+				shape-rendering="crispEdges"
+			>
+				<rect x="3" y="8" width="26" height="16" stroke="#000" fill="#FFF"
+				></rect>
+				<rect x="5" y="10" width="22" height="8" fill="#000"></rect>
+				<rect x="24" y="20" width="3" height="2" fill="#000"></rect>
 			</svg>
 		</span>
 		<span class="icon-label">Hard Disk</span>
 	</button>
-	<button class="desktop-icon" data-icon-id="trash" style="left:12px; top:108px;">
+	<button
+		class="desktop-icon"
+		data-icon-id="trash"
+		style="left:12px; top:108px;"
+	>
 		<span class="icon-svg" aria-hidden="true">
-			<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-				<rect x="10" y="8" width="12" height="3" fill="#000" />
-				<rect x="8" y="11" width="16" height="13" stroke="#000" fill="#FFF" />
-				<rect x="10" y="14" width="2" height="8" fill="#000" />
-				<rect x="15" y="14" width="2" height="8" fill="#000" />
-				<rect x="20" y="14" width="2" height="8" fill="#000" />
+			<svg
+				width="32"
+				height="32"
+				viewBox="0 0 32 32"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+				shape-rendering="crispEdges"
+			>
+				<rect x="10" y="8" width="12" height="3" fill="#000"></rect>
+				<rect x="8" y="11" width="16" height="13" stroke="#000" fill="#FFF"
+				></rect>
+				<rect x="10" y="14" width="2" height="8" fill="#000"></rect>
+				<rect x="15" y="14" width="2" height="8" fill="#000"></rect>
+				<rect x="20" y="14" width="2" height="8" fill="#000"></rect>
 			</svg>
 		</span>
 		<span class="icon-label">Trash</span>
@@ -28,58 +52,72 @@
 </div>
 
 <script is:inline>
-	(function(){
+	(function () {
 		const layer = document.currentScript.parentElement;
-		const icons = Array.from(layer.querySelectorAll('.desktop-icon'));
+		const icons = Array.from(layer.querySelectorAll(".desktop-icon"));
 
-		function selectIcon(el){
-			icons.forEach(i => i.classList.toggle('selected', i === el));
+		function selectIcon(el) {
+			icons.forEach((i) => i.classList.toggle("selected", i === el));
 		}
-		function clearSelection(){ icons.forEach(i => i.classList.remove('selected')); }
-
-		function openById(id){
-			try{ const wm = window.__windowManager; if (wm && wm.setVisible) { wm.setVisible(id, true); return; } }catch{}
-			try{ window.dispatchEvent(new CustomEvent('window-visibility-change',{ detail:{ id, visible:true }})); }catch{}
+		function clearSelection() {
+			icons.forEach((i) => i.classList.remove("selected"));
 		}
 
-		layer.addEventListener('click', (e)=>{
+		function openById(id) {
+			try {
+				const wm = window.__windowManager;
+				if (wm && wm.setVisible) {
+					wm.setVisible(id, true);
+					return;
+				}
+			} catch {}
+			try {
+				window.dispatchEvent(
+					new CustomEvent("window-visibility-change", {
+						detail: { id, visible: true },
+					})
+				);
+			} catch {}
+		}
+
+		layer.addEventListener("click", (e) => {
 			const t = e.target;
 			if (!(t instanceof Element)) return;
-			const btn = t.closest('.desktop-icon');
+			const btn = t.closest(".desktop-icon");
 			if (!btn) return;
 			selectIcon(btn);
 		});
 
-		layer.addEventListener('dblclick', (e)=>{
+		layer.addEventListener("dblclick", (e) => {
 			const t = e.target;
 			if (!(t instanceof Element)) return;
-			const btn = t.closest('.desktop-icon');
+			const btn = t.closest(".desktop-icon");
 			if (!btn) return;
-			const id = btn.getAttribute('data-icon-id');
-			if (id === 'harddisk') openById('harddisk-window');
-			if (id === 'trash') openById('trash-window');
+			const id = btn.getAttribute("data-icon-id");
+			if (id === "harddisk") openById("harddisk-window");
+			if (id === "trash") openById("trash-window");
 		});
 
 		// Clicking empty desktop clears selection
-		const desktop = document.querySelector('[data-desktop-canvas]');
-		if (desktop){
-			desktop.addEventListener('mousedown', (e)=>{
+		const desktop = document.querySelector("[data-desktop-canvas]");
+		if (desktop) {
+			desktop.addEventListener("mousedown", (e) => {
 				const t = e.target;
 				if (!(t instanceof Element)) return;
-				if (!t.closest('.desktop-icon')) clearSelection();
+				if (!t.closest(".desktop-icon")) clearSelection();
 			});
 		}
 	})();
 </script>
 
 <style is:inline>
-	.desktop-icons-layer{
+	.desktop-icons-layer {
 		position: absolute;
 		inset: 0;
 		z-index: 2; /* below windows (>=10), above background (1) */
 		pointer-events: none; /* only icons receive */
 	}
-	.desktop-icon{
+	.desktop-icon {
 		position: absolute;
 		display: inline-flex;
 		flex-direction: column;
@@ -92,14 +130,23 @@
 		pointer-events: auto; /* clickable */
 		user-select: none;
 	}
-	.icon-svg svg{ image-rendering: pixelated; display:block; }
-	.desktop-icon.selected{ outline: 1px dotted var(--black); outline-offset: 2px; }
-	.icon-label{
+	.icon-svg svg {
+		image-rendering: pixelated;
+		display: block;
+	}
+	.desktop-icon.selected {
+		outline: 1px dotted var(--black);
+		outline-offset: 2px;
+	}
+	.icon-label {
 		font-size: var(--fs-9);
 		line-height: var(--lh-ui);
 		color: var(--black);
 		background: transparent;
 		padding: 0 3px;
 	}
-	.desktop-icon.selected .icon-label{ background: var(--black); color: var(--white); }
+	.desktop-icon.selected .icon-label {
+		background: var(--black);
+		color: var(--white);
+	}
 </style>
