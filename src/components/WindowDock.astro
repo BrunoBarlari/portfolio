@@ -2,9 +2,13 @@
 /** WindowDock: icons on the right to reopen hidden windows (System 7 style: icon + label, press animation) */
 const base = (import.meta as any).env?.BASE_URL || "/";
 const icons = [
-	{ id: "about-window", label: "About", src: base + "icons/apple.svg" },
+	{ id: "about-window", label: "About", src: base + "icons/about.svg" },
 	{ id: "contact-window", label: "Contact", src: base + "icons/email.svg" },
-	{ id: "projects-window", label: "Projects", src: base + "icons/github.svg" },
+	{
+		id: "projects-window",
+		label: "Projects",
+		src: base + "icons/projects.svg",
+	},
 ];
 ---
 
