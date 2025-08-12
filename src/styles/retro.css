@@ -296,24 +296,10 @@ html,body{ font-family: var(--font-ui); font-size: var(--fs-10); line-height: va
 .menubar .clock{ color: var(--black) !important; font-size: inherit; }
 
 /* --- Fixed desktop (no page scroll) --- */
-:root{ --menubar-height: 28px; }
-html, body { 
-  height: 100dvh; 
-  overflow: hidden; 
-  margin: 0; 
-  padding: 0;
-  /* Prevent any scrolling or movement */
-  position: fixed;
-  width: 100%;
-}
-.menubar{ height: var(--menubar-height) !important; position: fixed !important; }
-
-/* Remove old desktop canvas styles that might interfere */
-[data-desktop-canvas] { 
-  /* Override any previous positioning */
-  position: fixed !important;
-  pointer-events: none !important;
-}
+:root{ --menubar-height: 24px; }
+.menubar{ height: var(--menubar-height) !important; position: fixed !important; z-index: 100 !important; }
+/* Keep desktop canvas interactive */
+[data-desktop-canvas] { pointer-events: auto !important; }
 
 /* Desktop-like grid DISABLED completamente */
 .desktop-grid { display: none !important; }

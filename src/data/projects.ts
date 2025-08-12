@@ -9,24 +9,16 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    title: 'Optimización de build y DX',
-    summary: 'Reducción del tiempo de build en 45% y setup DX reproducible con scripts y plantillas.',
+    title: 'Microservicios backend para Max (Warner Bros. Discovery)',
+    summary:
+      'Contribución al desarrollo y mantenimiento de microservicios en Java y Spring Boot para la plataforma Max, participando en el lanzamiento en Asia (Taiwán, Hong Kong). Pruebas automatizadas con JUnit y Mockito y consultas optimizadas en MongoDB.',
     year: 2024,
-    tech: ['Astro','TypeScript','CI/CD'],
-    links: [ { label: 'Notas', url: '#' } ]
+    tech: ['Java','Spring Boot','MongoDB','JUnit','Mockito','AWS Lambda (Python)','APIs REST'],
   },
   {
-    title: 'Diseño de arquitectura frontend',
-    summary: 'Diseño modular, lazy loading por rutas y contratos claros entre features.',
+    title: 'Sistema integral de gestión contable y fiscal',
+    summary:
+      'Solución para automatizar tareas diarias de contadores, mejorar eficiencia, reducir errores y ofrecer visión clara de la situación financiera empresarial.',
     year: 2023,
-    tech: ['React','Vite','Rendimiento'],
-    links: [ { label: 'Caso', url: '#' } ]
-  },
-  {
-    title: 'Observabilidad full-stack',
-    summary: 'Trazas distribuidas, métricas y dashboards que redujeron MTTR en 30%.',
-    year: 2022,
-    tech: ['Node.js','OpenTelemetry','Grafana'],
-    links: [ { label: 'Resumen', url: '#' } ]
   }
 ];

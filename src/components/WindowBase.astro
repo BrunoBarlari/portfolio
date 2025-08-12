@@ -26,7 +26,7 @@ const {
 <div
 	class="window-component resize-drag"
 	id={windowId}
-	style={`left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; z-index: ${zIndex};${initiallyVisible ? '' : ' display:none;'}`}
+	style={`left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; z-index: ${zIndex};${initiallyVisible ? "" : " display:none;"}`}
 	data-x="0"
 	data-y="0"
 >
@@ -55,7 +55,7 @@ const {
 		let zoomed = false;
 		let shaded = false;
 		let savedHeight = null;
-		const bodyEl = windowEl.querySelector('.window-body');
+		const bodyEl = windowEl.querySelector(".window-body");
 
 		function emitFocused() {
 			try {
@@ -111,7 +111,8 @@ const {
 		// Helpers
 		function getCanvas() {
 			let el = windowEl.parentElement;
-			while (el && !el.hasAttribute("data-desktop-canvas")) el = el.parentElement;
+			while (el && !el.hasAttribute("data-desktop-canvas"))
+				el = el.parentElement;
 			return el || document.body;
 		}
 
@@ -127,25 +128,29 @@ const {
 		}
 
 		// Zoom behavior (toggle between saved rect and fit-to-canvas)
-		function doShadeToggle(){
-			if (!shaded){
-				savedHeight = windowEl.style.height || (windowEl.offsetHeight + 'px');
-				const tb = windowEl.querySelector('.window-titlebar');
+		function doShadeToggle() {
+			if (!shaded) {
+				savedHeight = windowEl.style.height || windowEl.offsetHeight + "px";
+				const tb = windowEl.querySelector(".window-titlebar");
 				const th = tb ? tb.offsetHeight : 18;
-				if (bodyEl) bodyEl.style.display = 'none';
-				windowEl.style.height = th + 'px';
+				if (bodyEl) bodyEl.style.display = "none";
+				windowEl.style.height = th + "px";
 				shaded = true;
 			} else {
-				if (bodyEl) bodyEl.style.display = '';
+				if (bodyEl) bodyEl.style.display = "";
 				if (savedHeight) windowEl.style.height = savedHeight;
 				shaded = false;
 			}
 			bringToFront();
 		}
 		// Double-click title bar to shade/unshade
-		titleBar.addEventListener('dblclick', (e)=>{
+		titleBar.addEventListener("dblclick", (e) => {
 			const t = e.target;
-			if (t instanceof Element && t.closest('.window-close-btn, .window-zoom-btn')) return;
+			if (
+				t instanceof Element &&
+				t.closest(".window-close-btn, .window-zoom-btn")
+			)
+				return;
 			doShadeToggle();
 		});
 
@@ -358,19 +363,26 @@ const {
 		text-align: center;
 	}
 
-	.window-zoom-btn{
+	.window-zoom-btn {
 		position: absolute;
 		right: 2px;
 		top: 2px;
-		width: 11px; height: 11px;
+		width: 11px;
+		height: 11px;
 		border: var(--border);
 		background: var(--white);
-		box-shadow: inset -1px -1px 0 0 var(--gray-75), inset 1px 1px 0 0 var(--highlight);
-		padding:0; line-height:0; color:transparent;
+		box-shadow:
+			inset -1px -1px 0 0 var(--gray-75),
+			inset 1px 1px 0 0 var(--highlight);
+		padding: 0;
+		line-height: 0;
+		color: transparent;
 		cursor: pointer;
 	}
-	.window-zoom-btn:active{
-		box-shadow: inset 1px 1px 0 0 var(--gray-75), inset -1px -1px 0 0 var(--highlight);
+	.window-zoom-btn:active {
+		box-shadow:
+			inset 1px 1px 0 0 var(--gray-75),
+			inset -1px -1px 0 0 var(--highlight);
 	}
 
 	.window-body {
