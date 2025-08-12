@@ -183,7 +183,7 @@ a:hover, a:focus-visible { text-decoration: underline; }
 .menu-item a:focus-visible { outline: 2px dotted var(--focus-ring); outline-offset:-2px; }
 
 .clock { margin-left:auto; font-variant-numeric:tabular-nums; }
-.status { margin-left:1rem; opacity:.8; }
+.menubar .clock{ color: var(--black) !important; font-size: inherit; }
 
 .window { box-shadow: 0 6px 14px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; will-change: transform, opacity, box-shadow; animation: winIn 220ms var(--anim-ease) both; transition: box-shadow 160ms var(--anim-ease), transform 160ms var(--anim-ease); }
 .title-bar { display:flex; align-items:center; gap:.5rem; background:
@@ -293,7 +293,7 @@ html,body{ font-family: var(--font-ui); font-size: var(--fs-10); line-height: va
 .menu-list{ font-size: var(--fs-10) !important; }
 .menu-item{ padding: 0 6px !important; }
 .menu-item a{ padding: 3px 8px !important; color: var(--black) !important; text-decoration: none !important; }
-.menubar .clock, .menubar .status{ color: var(--black) !important; font-size: inherit; }
+.menubar .clock{ color: var(--black) !important; font-size: inherit; }
 
 /* --- Fixed desktop (no page scroll) --- */
 :root{ --menubar-height: 24px; }
@@ -332,3 +332,54 @@ html, body {
 [data-desktop-canvas] { pointer-events: auto !important; }
 /* Asegurar que las ventanas base también acepten eventos */
 .window-component { pointer-events: auto; }
+
+/* --- Dropdown menus: unified System 7 flat style overrides --- */
+/* Keep crisp 1px border, white bg, no shadows, compact spacing */
+.menubar .menu-list { background: var(--white) !important; border: var(--border) !important; box-shadow: none !important; padding: 2px 0 !important; min-width: 180px; }
+
+/* Make items fill width and remove native button styles */
+.menubar .menu-item > a,
+.menubar .menu-item > button {
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 3px 8px !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: var(--lh-ui) !important;
+  cursor: default !important;
+}
+
+/* Hover/active state: classic inverted highlight */
+.menubar .menu-item:hover > a,
+.menubar .menu-item:hover > button,
+.menubar .menu-item:focus-within > a,
+.menubar .menu-item:focus-within > button {
+  background: var(--black) !important;
+  color: var(--white) !important;
+}
+
+/* Disabled item */
+.menubar .menu-item[aria-disabled="true"] > a,
+.menubar .menu-item[aria-disabled="true"] > button {
+  color: var(--gray-60) !important;
+  pointer-events: none !important;
+}
+
+/* Focus-visible outline inside inverted hover stays legible */
+.menubar .menu-item > a:focus-visible,
+.menubar .menu-item > button:focus-visible {
+  outline: 2px dotted var(--focus-ring) !important;
+  outline-offset: -2px !important;
+}
+
+/* Open menu button matches hover style for consistency */
+.menubar .menu-root.open > .menu-button,
+.menubar .menu-button:hover,
+.menubar .menu-button:focus {
+  background: var(--black) !important;
+  color: var(--white) !important;
+  border: 0 !important;
+}

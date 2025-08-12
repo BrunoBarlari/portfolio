@@ -48,6 +48,16 @@ const {
 		const titleBar = windowEl.querySelector("[data-drag-handle]");
 		const closeBtn = windowEl.querySelector(".window-close-btn");
 
+		function emitFocused() {
+			try {
+				const title =
+					windowEl.querySelector(".window-title-text")?.textContent || "";
+				window.dispatchEvent(
+					new CustomEvent("window-focused", { detail: { id: windowId, title } })
+				);
+			} catch {}
+		}
+
 		// Visibility manager (singleton on window)
 		function ensureManager() {
 			// @ts-ignore
@@ -98,6 +108,7 @@ const {
 				if (z > maxZ) maxZ = z;
 			});
 			windowEl.style.zIndex = (maxZ + 1).toString();
+			emitFocused();
 		}
 
 		// Initialize Interact.js following the exact documentation pattern
@@ -188,6 +199,10 @@ const {
 
 		// Register initial visibility as true
 		manager.register(windowId, windowEl.style.display !== "none");
+		// Emit focused for the first visible window (best-effort)
+		if (windowEl.style.display !== "none") {
+			emitFocused();
+		}
 
 		// Initialize when Interact.js is ready
 		if (window.interact) {
