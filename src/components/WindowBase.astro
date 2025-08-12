@@ -58,6 +58,22 @@ const {
 		const bodyEl = windowEl.querySelector(".window-body");
 		let hasOpened = false;
 
+		// --- SFX helper ---
+		let __sfx = null;
+		async function getSfx() {
+			if (__sfx) return __sfx;
+			try {
+				if (window.__sfx) { __sfx = window.__sfx; return __sfx; }
+				const mod = await import('/src/lib/sfx.js');
+				__sfx = (mod && mod.getSfx) ? mod.getSfx() : null;
+				return __sfx;
+			} catch { return null; }
+		}
+
+		function playOpen() { getSfx().then((s) => s && s.open && s.open()); }
+		function playClose() { getSfx().then((s) => s && s.close && s.close()); }
+		// --- end SFX helper ---
+
 		function emitFocused() {
 			try {
 				const title =
@@ -286,6 +302,7 @@ const {
 		// Close button functionality: only hide and update manager
 		closeBtn.addEventListener("click", () => {
 			if (windowEl.style.display !== "none") {
+				playClose();
 				windowEl.style.display = "none";
 				manager.setVisible(windowId, false);
 			}
@@ -300,7 +317,9 @@ const {
 				windowEl.style.display = "block";
 				hasOpened = true;
 				bringToFront();
+				playOpen();
 			} else {
+				playClose();
 				windowEl.style.display = "none";
 			}
 		});

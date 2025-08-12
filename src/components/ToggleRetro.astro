@@ -8,12 +8,14 @@
 >
 	<label><input type="checkbox" data-scan /> Scanlines</label>
 	<label><input type="checkbox" data-dark /> Dark</label>
+	<label><input type="checkbox" data-sfx /> SFX</label>
 </div>
 <script is:inline>
 	(function () {
 		const root = document.currentScript.parentElement;
 		const scan = root.querySelector("[data-scan]");
 		const dark = root.querySelector("[data-dark]");
+		const sfx = root.querySelector("[data-sfx]");
 		scan.checked = document.documentElement.classList.contains("retro-extra");
 		dark.checked = document.documentElement.classList.contains("dark");
 		scan.addEventListener("change", () => {
@@ -33,6 +35,27 @@
 			document.documentElement.classList.add("dark");
 			dark.checked = true;
 		}
+
+		// SFX toggle: lazy-load manager, init state and persist
+		(function initSfxToggle() {
+			function fallbackDefault() {
+				const saved = localStorage.getItem("retroSounds");
+				if (saved === "1") return true;
+				if (saved === "0") return false;
+				return !matchMedia("(prefers-reduced-motion: reduce)").matches;
+			}
+			sfx.checked = fallbackDefault();
+			import('/src/lib/sfx.js').then((mod) => {
+				const api = mod && mod.getSfx ? mod.getSfx() : null;
+				if (api) {
+					// sync UI from manager
+					sfx.checked = !!api.enabled;
+					sfx.addEventListener('change', () => {
+						api.setEnabled(sfx.checked);
+					});
+				}
+			}).catch(() => {});
+		})();
 	})();
 </script>
 <style is:inline>

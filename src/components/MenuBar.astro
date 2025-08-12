@@ -1,5 +1,6 @@
 ---
 // MenuBar component: classic Macintosh style pulldown menus
+import ToggleRetro from "./ToggleRetro.astro";
 interface Props {
 	currentPath?: string;
 }
@@ -203,6 +204,10 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 
 	<div style="flex:1"></div>
 	<div class="clock" aria-live="polite" data-clock>00:00</div>
+	<!-- Retro toggles (Scanlines / Dark / SFX) -->
+	<div class="no-print" style="display:flex;align-items:center;gap:8px;margin-left:8px;">
+		<ToggleRetro />
+	</div>
 	<button
 		class="about-launch no-print"
 		type="button"
@@ -324,8 +329,22 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		setInterval(updateClock, 60 * 1000);
 
 		// Eliminado: comportamiento de "press-and-hold"; ahora sólo hover abre/cierra
+
+		// Play error SFX when interacting with disabled menu items
+		root.addEventListener("pointerdown", (e) => {
+			const t = e.target;
+			if (!(t instanceof Element)) return;
+			const disabledItem = t.closest(".menu-item[aria-disabled=\"true\"]");
+			if (disabledItem) {
+				import('/src/lib/sfx.js')
+					.then((m) => m.getSfx && m.getSfx())
+					.then((s) => s && s.error && s.error())
+					.catch(() => {});
+			}
+		});
 	})();
 </script>
+
 <style is:inline>
 	.about-launch {
 		background: none;

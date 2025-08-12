@@ -51,6 +51,11 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		<script
 			src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"
 			defer></script>
+		<!-- Pre-initialize SFX manager and expose as window.__sfx -->
+		<script type="module">
+			import { getSfx } from '/src/lib/sfx.js';
+			try { window.__sfx = getSfx(); } catch {}
+		</script>
 	</head>
 	<body>
 		<a href="#content" class="sr-only-focus">Saltar al contenido</a>
