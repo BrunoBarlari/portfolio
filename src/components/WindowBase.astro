@@ -172,16 +172,20 @@ const {
 		// Zoom behavior (toggle between saved rect and fit-to-canvas)
 		function doShadeToggle() {
 			if (!shaded) {
+				// collapsing (shade)
 				savedHeight = windowEl.style.height || windowEl.offsetHeight + "px";
 				const tb = windowEl.querySelector(".window-titlebar");
 				const th = tb ? tb.offsetHeight : 18;
 				if (bodyEl) bodyEl.style.display = "none";
 				windowEl.style.height = th + "px";
 				shaded = true;
+				playClose();
 			} else {
+				// expanding (unshade)
 				if (bodyEl) bodyEl.style.display = "";
 				if (savedHeight) windowEl.style.height = savedHeight;
 				shaded = false;
+				playOpen();
 			}
 			bringToFront();
 		}
@@ -199,7 +203,7 @@ const {
 		function doZoomToggle() {
 			const canvas = getCanvas();
 			if (!zoomed) {
-				// Save current geometry (including transform offsets)
+				// zoom to canvas
 				const rect = {
 					left: parseFloat(windowEl.style.left) || 0,
 					top: parseFloat(windowEl.style.top) || 0,
@@ -209,7 +213,6 @@ const {
 					y: parseFloat(windowEl.getAttribute("data-y")) || 0,
 				};
 				savedRect = rect;
-				// Reset transform and expand to canvas with small padding
 				windowEl.style.transform = "translate(0px, 0px)";
 				windowEl.setAttribute("data-x", "0");
 				windowEl.setAttribute("data-y", "0");
@@ -222,6 +225,7 @@ const {
 				windowEl.style.height = Math.max(140, ch - pad * 2) + "px";
 				zoomed = true;
 				bringToFront();
+				playOpen();
 			} else if (savedRect) {
 				windowEl.style.left = savedRect.left + "px";
 				windowEl.style.top = savedRect.top + "px";
@@ -232,6 +236,7 @@ const {
 				windowEl.setAttribute("data-y", String(savedRect.y));
 				zoomed = false;
 				bringToFront();
+				playClose();
 			}
 		}
 		zoomBtn.addEventListener("click", doZoomToggle);
