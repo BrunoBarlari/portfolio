@@ -287,6 +287,11 @@ html,body{ font-family: var(--font-ui); font-size: var(--fs-10); line-height: va
 .menu-item:hover, .menu-item a:hover { background: var(--black) !important; color: var(--white) !important; }
 .menuitem[aria-disabled="true"], .menu-item[aria-disabled="true"]{ color: var(--gray-60) !important; }
 
+/* Remove bullets from menubar dropdowns */
+.menubar .menu-list,
+.menubar .menu-item { list-style: none !important; }
+.menubar .menu-list { margin: 0 !important; padding-left: 0 !important; }
+
 /* --- System 7.2 MENUBAR size + contrast overrides --- */
 .menubar{ height: 24px !important; font-size: var(--fs-12) !important; padding: 0 10px !important; color: var(--black) !important; }
 .menu-button{ height: 100% !important; padding: 0 8px !important; color: var(--black) !important; font-weight: 700; }

@@ -129,6 +129,7 @@
 		cursor: default;
 		pointer-events: auto; /* clickable */
 		user-select: none;
+		width: 84px; /* ancho fijo de celda para alinear íconos (icono centrado) */
 	}
 	.icon-svg svg {
 		image-rendering: pixelated;
@@ -144,6 +145,8 @@
 		color: var(--black);
 		background: transparent;
 		padding: 0 3px;
+		text-align: center; /* asegura centrado del texto en la celda fija */
+		white-space: nowrap; /* evita salto que cambie ancho visual */
 	}
 	.desktop-icon.selected .icon-label {
 		background: var(--black);
