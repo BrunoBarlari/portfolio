@@ -178,6 +178,7 @@ const {
 		border-bottom: var(--border);
 		cursor: move;
 		user-select: none;
+		position: relative; /* necesario para centrar absoluto */
 	}
 
 	.window-close-btn {
@@ -196,9 +197,14 @@ const {
 	}
 
 	.window-title-text {
-		flex: 1;
+		/* centrado absoluto */
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
 		font-weight: 700;
 		pointer-events: none;
+		white-space: nowrap;
+		text-align: center;
 	}
 
 	.window-body {
