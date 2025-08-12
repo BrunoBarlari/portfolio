@@ -121,6 +121,27 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		</ul>
 	</div>
 
+	<!-- Special menu (System 7 vibe) -->
+	<div class="menu-root" data-menu data-menu-id="special">
+		<button
+			class="menu-button"
+			type="button"
+			aria-haspopup="true"
+			aria-expanded="false">Special</button
+		>
+		<ul class="menu-list" role="menu" aria-label="Special menu">
+			<li class="menu-item" aria-disabled="true">
+				<button type="button" role="menuitem" disabled>Empty Trash</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Restart…</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Shut Down…</button>
+			</li>
+		</ul>
+	</div>
+
 	<div style="flex:1"></div>
 	<div class="clock" aria-live="polite" data-clock>00:00</div>
 	<button
