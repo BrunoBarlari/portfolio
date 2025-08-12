@@ -8,6 +8,8 @@ import ProjectsWindow from "../components/ProjectsWindow.astro";
 import AboutThisMacWindow from "../components/AboutThisMacWindow.astro";
 import HardDiskWindow from "../components/HardDiskWindow.astro";
 import TrashWindow from "../components/TrashWindow.astro";
+import ProjectDetailWindow from "../components/ProjectDetailWindow.astro";
+import { projects } from "../data/projects";
 ---
 
 <Base>
@@ -16,6 +18,11 @@ import TrashWindow from "../components/TrashWindow.astro";
 		<AboutWindow />
 		<ContactWindow />
 		<ProjectsWindow />
+		{
+			projects.map((p, i) => (
+				<ProjectDetailWindow project={p} windowId={`project-${i}-window`} />
+			))
+		}
 		<AboutThisMacWindow />
 		<HardDiskWindow />
 		<TrashWindow />

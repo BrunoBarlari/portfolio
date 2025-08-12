@@ -5,7 +5,11 @@ import DesktopIcons from "./DesktopIcons.astro";
 const base = (import.meta as any).env?.BASE_URL || "/";
 ---
 
-<div class="desktop-background" data-desktop-canvas style={`--desktop-bg: url('${base}image.png')`}>
+<div
+	class="desktop-background"
+	data-desktop-canvas
+	style={`--desktop-bg: url('${base}image.png')`}
+>
 	<DesktopIcons />
 	<slot />
 	<WindowDock />

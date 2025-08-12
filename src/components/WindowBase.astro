@@ -127,8 +127,10 @@ const {
 			windowEl.style.transform = "translate(0px, 0px)";
 			windowEl.setAttribute("data-x", "0");
 			windowEl.setAttribute("data-y", "0");
-			const ww = windowEl.offsetWidth || parseFloat(windowEl.style.width) || 400;
-			const wh = windowEl.offsetHeight || parseFloat(windowEl.style.height) || 300;
+			const ww =
+				windowEl.offsetWidth || parseFloat(windowEl.style.width) || 400;
+			const wh =
+				windowEl.offsetHeight || parseFloat(windowEl.style.height) || 300;
 			const cw = canvas.clientWidth;
 			const ch = canvas.clientHeight;
 			const pad = 8;
