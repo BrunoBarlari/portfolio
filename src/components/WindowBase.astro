@@ -56,6 +56,7 @@ const {
 		let shaded = false;
 		let savedHeight = null;
 		const bodyEl = windowEl.querySelector(".window-body");
+		let hasOpened = false;
 
 		function emitFocused() {
 			try {
@@ -114,6 +115,29 @@ const {
 			while (el && !el.hasAttribute("data-desktop-canvas"))
 				el = el.parentElement;
 			return el || document.body;
+		}
+
+		function centerWindow() {
+			const canvas = getCanvas();
+			if (!canvas) return;
+			// Asegurar medidas reales
+			const prevDisplay = windowEl.style.display;
+			if (prevDisplay === "none") windowEl.style.display = "block";
+			// Resetear desplazamiento previo para centrar correctamente
+			windowEl.style.transform = "translate(0px, 0px)";
+			windowEl.setAttribute("data-x", "0");
+			windowEl.setAttribute("data-y", "0");
+			const ww = windowEl.offsetWidth || parseFloat(windowEl.style.width) || 400;
+			const wh = windowEl.offsetHeight || parseFloat(windowEl.style.height) || 300;
+			const cw = canvas.clientWidth;
+			const ch = canvas.clientHeight;
+			const pad = 8;
+			const left = Math.max(pad, Math.round((cw - ww) / 2));
+			const top = Math.max(pad, Math.round((ch - wh) / 2));
+			windowEl.style.left = left + "px";
+			windowEl.style.top = top + "px";
+			// Restaurar display si correspondía
+			if (prevDisplay === "none") windowEl.style.display = "none";
 		}
 
 		function bringToFront() {
@@ -270,7 +294,9 @@ const {
 			var detail = (e && e.detail) || {};
 			if (detail.id !== windowId) return;
 			if (detail.visible) {
+				if (!hasOpened) centerWindow();
 				windowEl.style.display = "block";
+				hasOpened = true;
 				bringToFront();
 			} else {
 				windowEl.style.display = "none";
@@ -282,8 +308,10 @@ const {
 
 		// Register initial visibility
 		manager.register(windowId, windowEl.style.display !== "none");
-		// Emit focused for the first visible window (best-effort)
 		if (windowEl.style.display !== "none") {
+			if (!hasOpened) centerWindow();
+			hasOpened = true;
+			// Emit focused for the first visible window (best-effort)
 			emitFocused();
 		}
 
