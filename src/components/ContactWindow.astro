@@ -1,0 +1,85 @@
+---
+import WindowBase from "./WindowBase.astro";
+import { profile } from "../data/profile";
+
+const githubLabel = profile.links.github
+	? "@" + profile.links.github.split("/").filter(Boolean).pop()
+	: "";
+const twitterLabel = profile.links.twitter
+	? "@" + (profile.links.twitter as string).split("/").filter(Boolean).pop()
+	: "";
+let linkedinLabel = "";
+try {
+	linkedinLabel = profile.links.linkedin
+		? new URL(profile.links.linkedin).pathname
+		: "";
+} catch {
+	linkedinLabel = profile.links.linkedin || "";
+}
+---
+
+<WindowBase
+	title="Contact"
+	x={24}
+	y={350}
+	width={420}
+	height={220}
+	zIndex={13}
+	windowId="contact-window"
+>
+	<div id="contact">
+		<p>¿Conversamos? Puedes escribirme o conectar en redes:</p>
+		<ul class="text-sm list-disc pl-5 leading-relaxed">
+			<li>
+				Email: <a href={profile.links.email} class="btn-link"
+					>{profile.contactEmail}</a
+				>
+			</li>
+			{
+				profile.links.linkedin && (
+					<li>
+						LinkedIn:{" "}
+						<a
+							href={profile.links.linkedin}
+							class="btn-link"
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							{linkedinLabel}
+						</a>
+					</li>
+				)
+			}
+			{
+				profile.links.github && (
+					<li>
+						GitHub:{" "}
+						<a
+							href={profile.links.github}
+							class="btn-link"
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							{githubLabel}
+						</a>
+					</li>
+				)
+			}
+			{
+				profile.links.twitter && (
+					<li>
+						Twitter:{" "}
+						<a
+							href={profile.links.twitter}
+							class="btn-link"
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							{twitterLabel}
+						</a>
+					</li>
+				)
+			}
+		</ul>
+	</div>
+</WindowBase>

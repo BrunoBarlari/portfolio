@@ -1,0 +1,48 @@
+---
+import WindowBase from "./WindowBase.astro";
+import { projects } from "../data/projects";
+---
+
+<WindowBase
+	title="Projects"
+	x={480}
+	y={300}
+	width={560}
+	height={360}
+	zIndex={14}
+	windowId="projects-window"
+>
+	<div id="projects" class="projects-list">
+		{
+			projects.map((p) => (
+				<article class="project">
+					<h3 class="project-title">
+						{p.title} {p.year && <small class="year">· {p.year}</small>}
+					</h3>
+					<p class="project-summary">{p.summary}</p>
+					{p.tech && <p class="project-tech">{p.tech.join(" · ")}</p>}
+					{p.links && p.links.length > 0 && (
+						<p class="project-links">
+							{p.links
+								.map((l) => (
+									<a
+										href={l.url}
+										class="btn-link"
+										rel="noopener noreferrer"
+										target={l.url.startsWith("http") ? "_blank" : undefined}
+									>
+										{l.label}
+									</a>
+								))
+								.reduce(
+									(acc, el, i, arr) =>
+										acc.concat(el, i < arr.length - 1 ? " · " : ""),
+									[]
+								)}
+						</p>
+					)}
+				</article>
+			))
+		}
+	</div>
+</WindowBase>

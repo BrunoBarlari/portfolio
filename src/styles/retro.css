@@ -297,6 +297,38 @@ html,body{ font-family: var(--font-ui); font-size: var(--fs-10); line-height: va
 
 /* --- Fixed desktop (no page scroll) --- */
 :root{ --menubar-height: 24px; }
-html, body { height: 100dvh; overflow: hidden; }
-.menubar{ height: var(--menubar-height) !important; }
-[data-desktop-canvas]{ position: relative; height: calc(100dvh - var(--menubar-height)); overflow: hidden; padding: 8px; }
+html, body { 
+  height: 100dvh; 
+  overflow: hidden; 
+  margin: 0; 
+  padding: 0;
+  /* Prevent any scrolling or movement */
+  position: fixed;
+  width: 100%;
+}
+.menubar{ height: var(--menubar-height) !important; position: fixed !important; }
+
+/* Remove old desktop canvas styles that might interfere */
+[data-desktop-canvas] { 
+  /* Override any previous positioning */
+  position: fixed !important;
+  pointer-events: none !important;
+}
+
+/* Desktop-like grid DISABLED completamente */
+.desktop-grid { display: none !important; }
+
+/* Asegúrate de que las ventanas flotantes funcionen correctamente */
+.draggable-window { 
+  pointer-events: all !important;
+  position: absolute !important;
+  z-index: 10 !important;
+}
+
+/* Desplazamiento del cuerpo de la ventana cuando está abierta */
+.window[data-open="true"] .window-body { overflow: auto !important; }
+
+/* --- Overrides para drag después de refactor --- */
+[data-desktop-canvas] { pointer-events: auto !important; }
+/* Asegurar que las ventanas base también acepten eventos */
+.window-component { pointer-events: auto; }

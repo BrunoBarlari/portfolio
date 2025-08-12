@@ -1,0 +1,374 @@
+---
+/** DraggableWindow: Self-contained draggable and resizable window component */
+interface Props {
+	title: string;
+	x?: number;
+	y?: number;
+	width?: number;
+	height?: number;
+	initiallyOpen?: boolean;
+	zIndex?: number;
+}
+
+const {
+	title,
+	x = 20,
+	y = 20,
+	width = 400,
+	height = 300,
+	initiallyOpen = true,
+	zIndex = 10,
+} = Astro.props as Props;
+
+const windowId = "window-" + Math.random().toString(36).slice(2);
+const bodyId = "body-" + windowId;
+---
+
+<div
+	class="draggable-window"
+	data-window-id={windowId}
+	data-draggable="true"
+	style={`left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; z-index: ${zIndex};`}
+>
+	<div class="window-chrome">
+		<div class="title-bar" data-drag-handle>
+			<button
+				class="close-btn"
+				type="button"
+				aria-label="Cerrar ventana"
+				data-close-window
+			>
+				×
+			</button>
+			<span class="window-title">{title}</span>
+		</div>
+		<div
+			class="window-content"
+			id={bodyId}
+			data-window-open={initiallyOpen ? "true" : "false"}
+		>
+			<slot />
+		</div>
+	</div>
+	<div class="resize-handles">
+		<div class="resize-handle resize-se" data-resize-handle="se"></div>
+	</div>
+</div>
+
+<script is:inline>
+	(function () {
+		const windowElement = document.currentScript.parentElement;
+		const dragHandle = windowElement.querySelector("[data-drag-handle]");
+		const closeBtn = windowElement.querySelector("[data-close-window]");
+		const content = windowElement.querySelector(".window-content");
+		const resizeHandle = windowElement.querySelector("[data-resize-handle]");
+
+		let isDragging = false;
+		let isResizing = false;
+		let startX, startY, startLeft, startTop, startWidth, startHeight;
+		let currentZ = parseInt(windowElement.style.zIndex) || 10;
+
+		// Bring window to front
+		function bringToFront() {
+			const allWindows = document.querySelectorAll(".draggable-window");
+			let maxZ = 10;
+			allWindows.forEach((w) => {
+				const z = parseInt(w.style.zIndex) || 10;
+				if (z > maxZ) maxZ = z;
+			});
+			currentZ = maxZ + 1;
+			windowElement.style.zIndex = currentZ;
+		}
+
+		// Get desktop boundaries
+		function getDesktopBounds() {
+			const desktop = document.querySelector("[data-desktop-canvas]");
+			if (!desktop)
+				return { width: window.innerWidth, height: window.innerHeight };
+			return {
+				width: window.innerWidth,
+				height:
+					window.innerHeight -
+					(parseInt(
+						getComputedStyle(document.documentElement).getPropertyValue(
+							"--menubar-height"
+						)
+					) || 24),
+			};
+		}
+
+		// Initialize with Interact.js if available
+		function initInteractJS() {
+			if (!window.interact) return false;
+
+			const interact = window.interact;
+
+			// Make ONLY the title bar draggable, not the whole window
+			interact(dragHandle).draggable({
+				inertia: false,
+				modifiers: [
+					interact.modifiers.restrictRect({
+						restriction: {
+							x: 0,
+							y: 0,
+							width: window.innerWidth,
+							height: window.innerHeight - 24,
+						},
+						endOnly: true,
+					}),
+				],
+				listeners: {
+					start() {
+						bringToFront();
+					},
+					move(event) {
+						const x =
+							(parseFloat(windowElement.getAttribute("data-x")) || 0) +
+							event.dx;
+						const y =
+							(parseFloat(windowElement.getAttribute("data-y")) || 0) +
+							event.dy;
+
+						// Move the WINDOW element, not the handle
+						windowElement.style.transform = `translate(${x}px, ${y}px)`;
+						windowElement.setAttribute("data-x", x);
+						windowElement.setAttribute("data-y", y);
+					},
+				},
+			});
+
+			// Make ONLY the window resizable from the handle
+			interact(windowElement).resizable({
+				edges: { right: true, bottom: true },
+				modifiers: [
+					interact.modifiers.restrictSize({
+						min: { width: 280, height: 140 },
+					}),
+				],
+				listeners: {
+					move(event) {
+						const x = parseFloat(windowElement.getAttribute("data-x")) || 0;
+						const y = parseFloat(windowElement.getAttribute("data-y")) || 0;
+
+						windowElement.style.width = event.rect.width + "px";
+						windowElement.style.height = event.rect.height + "px";
+
+						// Update transform for any edge changes
+						const newX = x + (event.deltaRect?.left || 0);
+						const newY = y + (event.deltaRect?.top || 0);
+
+						windowElement.style.transform = `translate(${newX}px, ${newY}px)`;
+						windowElement.setAttribute("data-x", newX);
+						windowElement.setAttribute("data-y", newY);
+					},
+				},
+			});
+
+			return true;
+		}
+
+		// Fallback drag implementation with proper containment
+		function initFallbackDrag() {
+			dragHandle.addEventListener("mousedown", (e) => {
+				if (e.target === closeBtn) return;
+
+				isDragging = true;
+				bringToFront();
+
+				const rect = windowElement.getBoundingClientRect();
+				startX = e.clientX;
+				startY = e.clientY;
+				startLeft = rect.left;
+				startTop = rect.top;
+
+				dragHandle.style.cursor = "grabbing";
+				e.preventDefault();
+				e.stopPropagation();
+			});
+
+			resizeHandle.addEventListener("mousedown", (e) => {
+				isResizing = true;
+				bringToFront();
+
+				const rect = windowElement.getBoundingClientRect();
+				startX = e.clientX;
+				startY = e.clientY;
+				startWidth = rect.width;
+				startHeight = rect.height;
+
+				e.preventDefault();
+				e.stopPropagation();
+			});
+
+			document.addEventListener("mousemove", (e) => {
+				if (isDragging) {
+					const bounds = getDesktopBounds();
+					const newLeft = Math.max(
+						0,
+						Math.min(
+							startLeft + (e.clientX - startX),
+							bounds.width - windowElement.offsetWidth
+						)
+					);
+					const newTop = Math.max(
+						0,
+						Math.min(
+							startTop + (e.clientY - startY),
+							bounds.height - windowElement.offsetHeight
+						)
+					);
+
+					windowElement.style.left = newLeft + "px";
+					windowElement.style.top = newTop + "px";
+				}
+
+				if (isResizing) {
+					const bounds = getDesktopBounds();
+					const maxWidth = bounds.width - windowElement.offsetLeft;
+					const maxHeight = bounds.height - windowElement.offsetTop;
+
+					const newWidth = Math.max(
+						280,
+						Math.min(startWidth + (e.clientX - startX), maxWidth)
+					);
+					const newHeight = Math.max(
+						140,
+						Math.min(startHeight + (e.clientY - startY), maxHeight)
+					);
+
+					windowElement.style.width = newWidth + "px";
+					windowElement.style.height = newHeight + "px";
+				}
+			});
+
+			document.addEventListener("mouseup", () => {
+				isDragging = false;
+				isResizing = false;
+				dragHandle.style.cursor = "";
+			});
+		}
+
+		// Close window functionality
+		closeBtn.addEventListener("click", () => {
+			const isOpen = content.getAttribute("data-window-open") === "true";
+			content.setAttribute("data-window-open", isOpen ? "false" : "true");
+			content.style.display = isOpen ? "none" : "block";
+		});
+
+		// Bring to front on click
+		windowElement.addEventListener("mousedown", bringToFront);
+
+		// Initialize drag system
+		if (window.interact) {
+			initInteractJS();
+		} else {
+			// Wait for Interact.js to load, or use fallback
+			window.addEventListener("load", () => {
+				if (window.interact) {
+					initInteractJS();
+				} else {
+					initFallbackDrag();
+				}
+			});
+		}
+	})();
+</script>
+
+<style is:inline>
+	.draggable-window {
+		position: absolute;
+		background: var(--white);
+		border: var(--border);
+		border-radius: 0;
+		box-shadow: none;
+		min-width: 280px;
+		min-height: 140px;
+		user-select: none;
+	}
+
+	.window-chrome {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.title-bar {
+		height: 18px;
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: 0 var(--space-2);
+		font-size: var(--fs-12);
+		font-weight: 700;
+		background: repeating-linear-gradient(
+			45deg,
+			var(--gray-25) 0 1px,
+			var(--white) 1px 2px
+		);
+		border-bottom: var(--border);
+		cursor: move;
+		user-select: none;
+	}
+
+	.close-btn {
+		width: 11px;
+		height: 11px;
+		border: var(--border);
+		background: var(--white);
+		padding: 0;
+		line-height: 0;
+		color: transparent;
+		box-shadow:
+			inset -1px -1px 0 0 var(--gray-75),
+			inset 1px 1px 0 0 var(--highlight);
+		cursor: pointer;
+		flex-shrink: 0;
+	}
+
+	.window-title {
+		flex: 1;
+		font-weight: 700;
+		pointer-events: none;
+	}
+
+	.window-content {
+		flex: 1;
+		padding: var(--space-4);
+		font-size: var(--fs-10);
+		line-height: var(--lh-ui);
+		overflow: auto;
+	}
+
+	.window-content[data-window-open="false"] {
+		display: none;
+	}
+
+	.resize-handles {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+	}
+
+	.resize-handle {
+		position: absolute;
+		pointer-events: all;
+	}
+
+	.resize-se {
+		right: 0;
+		bottom: 0;
+		width: 12px;
+		height: 12px;
+		cursor: nw-resize;
+		background: linear-gradient(135deg, transparent 50%, var(--gray-75) 50%);
+	}
+
+	@media (max-width: 768px) {
+		.title-bar {
+			cursor: default;
+		}
+		.resize-handle {
+			display: none;
+		}
+	}
+</style>
