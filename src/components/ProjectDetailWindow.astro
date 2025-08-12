@@ -1,0 +1,86 @@
+---
+import WindowBase from "./WindowBase.astro";
+import type { Project } from "../data/projects";
+
+interface Props {
+	project: Project;
+	windowId: string;
+	zIndex?: number;
+}
+
+const { project, windowId, zIndex = 20 } = Astro.props as Props;
+---
+
+<WindowBase
+	title={project.title}
+	x={60}
+	y={60}
+	width={520}
+	height={360}
+	zIndex={zIndex}
+	windowId={windowId}
+	initiallyVisible={false}
+>
+	<div class="guide">
+		<div class="guide-title">{project.title}</div>
+		{project.year && <div class="guide-meta">{project.year}</div>}
+		<p class="text-sm">{project.summary}</p>
+		{
+			project.tech && project.tech.length > 0 && (
+				<>
+					<div class="guide-subtitle">Tecnologías</div>
+					<ul class="guide-list text-sm">
+						{project.tech.map((t) => (
+							<li>{t}</li>
+						))}
+					</ul>
+				</>
+			)
+		}
+		{
+			project.links && project.links.length > 0 && (
+				<>
+					<div class="guide-subtitle">Links</div>
+					<ul class="guide-list text-sm">
+						{project.links.map((l) => (
+							<li>
+								<a
+									class="btn-link"
+									href={l.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{l.label}
+								</a>
+							</li>
+						))}
+					</ul>
+				</>
+			)
+		}
+	</div>
+</WindowBase>
+
+<style is:inline>
+	.guide {
+		font-size: var(--fs-10);
+		line-height: 1.35;
+	}
+	.guide-title {
+		font-weight: 700;
+		margin-bottom: 4px;
+	}
+	.guide-subtitle {
+		font-weight: 700;
+		margin: 8px 0 2px;
+	}
+	.guide-list {
+		list-style: disc;
+		padding-left: 1.1rem;
+		margin: 4px 0;
+	}
+	.guide-meta {
+		font-size: var(--fs-9);
+		opacity: 0.85;
+	}
+</style>
