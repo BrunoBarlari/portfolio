@@ -5,21 +5,11 @@ interface Props {
 }
 const { currentPath = "/" } = Astro.props as Props;
 const base = (import.meta as any).env?.BASE_URL || "/";
-const normalize = (p: string) => (p.endsWith("/") ? p : p + "/");
-const isHome =
-	currentPath === "/" ||
-	currentPath === base ||
-	normalize(currentPath) === normalize(base);
-const menus = [
-	{ label: "About", href: base + "#about" },
-	{ label: "Projects", href: base + "#projects" },
-	{ label: "Skills", href: base + "#skills" },
-	{ label: "Contact", href: base + "#contact" },
-];
 ---
 
 <nav class="menubar" aria-label="Primary">
-	<div class="menu-root apple" data-menu>
+	<!-- Apple logo menu -->
+	<div class="menu-root apple" data-menu data-menu-id="apple">
 		<button
 			class="menu-button"
 			type="button"
@@ -31,176 +21,179 @@ const menus = [
 		</button>
 		<ul class="menu-list" role="menu" aria-label="Apple menu">
 			<li class="menu-item">
-				<a
-					role="menuitem"
-					href={base}
-					aria-current={isHome ? "page" : undefined}>Home</a
+				<button type="button" role="menuitem" data-open-about
+					>About This Site…</button
 				>
-			</li>
-			<li class="menu-item">
-				<a
-					role="menuitem"
-					href={base + "about"}
-					aria-current={currentPath.endsWith("/about") ? "page" : undefined}
-					>About page</a
-				>
-			</li>
-			<li class="menu-item">
-				<a
-					role="menuitem"
-					href={base + "projects"}
-					aria-current={currentPath.endsWith("/projects") ? "page" : undefined}
-					>Projects page</a
-				>
-			</li>
-			<li class="menu-item">
-				<a role="menuitem" href={base + "#contact"}>Contact</a>
 			</li>
 		</ul>
 	</div>
-	{
-		menus.map((m) => (
-			<div class="menu-root" data-menu>
-				<button
-					class="menu-button"
-					type="button"
-					aria-haspopup="true"
-					aria-expanded="false"
-				>
-					{m.label}
-				</button>
-				<ul class="menu-list" role="menu" aria-label={m.label + " menu"}>
-					<li class="menu-item">
-						<a role="menuitem" href={m.href}>
-							{m.label} section
-						</a>
-					</li>
-					{m.label === "About" && (
-						<li class="menu-item">
-							<a
-								role="menuitem"
-								href={base + "about"}
-								aria-current={
-									currentPath.endsWith("/about") ? "page" : undefined
-								}
-							>
-								About page
-							</a>
-						</li>
-					)}
-					{m.label === "Projects" && (
-						<li class="menu-item">
-							<a
-								role="menuitem"
-								href={base + "projects"}
-								aria-current={
-									currentPath.endsWith("/projects") ? "page" : undefined
-								}
-							>
-								Projects page
-							</a>
-						</li>
-					)}
-				</ul>
-			</div>
-		))
-	}
+
+	<!-- Active app name (dynamic) -->
+	<div class="menu-root" data-menu data-menu-id="app">
+		<button
+			class="menu-button"
+			type="button"
+			aria-haspopup="true"
+			aria-expanded="false"
+		>
+			<span data-active-app-label>System</span>
+		</button>
+		<ul class="menu-list" role="menu" aria-label="Application menu">
+			<li class="menu-item">
+				<button type="button" role="menuitem" data-action="hide">Hide</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem" data-action="hide-others"
+					>Hide Others</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem" data-action="show-all"
+					>Show All</button>
+			</li>
+		</ul>
+	</div>
+
+	<!-- Edit menu -->
+	<div class="menu-root" data-menu data-menu-id="edit">
+		<button
+			class="menu-button"
+			type="button"
+			aria-haspopup="true"
+			aria-expanded="false">Edit</button
+		>
+		<ul class="menu-list" role="menu" aria-label="Edit menu">
+			<li class="menu-item">
+				<button type="button" role="menuitem">Undo</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Cut</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Copy</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Paste</button>
+			</li>
+		</ul>
+	</div>
+
+	<!-- View menu -->
+	<div class="menu-root" data-menu data-menu-id="view">
+		<button
+			class="menu-button"
+			type="button"
+			aria-haspopup="true"
+			aria-expanded="false">View</button
+		>
+		<ul class="menu-list" role="menu" aria-label="View menu">
+			<li class="menu-item">
+				<button type="button" role="menuitem">Zoom In</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Zoom Out</button>
+			</li>
+			<li class="menu-item">
+				<button type="button" role="menuitem">Actual Size</button>
+			</li>
+		</ul>
+	</div>
+
+	<div style="flex:1"></div>
 	<div class="clock" aria-live="polite" data-clock>00:00</div>
-	<div class="status" aria-hidden="true">OK</div>
+	<button
+		class="about-launch no-print"
+		type="button"
+		aria-label="Open About"
+		title="About"
+		data-open-about
+	>
+		<img
+			src={base + "icons/apple.svg"}
+			alt=""
+			width="20"
+			height="20"
+			style="image-rendering:pixelated;"
+		/>
+	</button>
 </nav>
+
 <script is:inline>
 	(function () {
 		const root = document.currentScript.parentElement;
 		const menus = Array.from(root.querySelectorAll("[data-menu]"));
 		let openMenu = null;
+
 		function closeAll() {
 			menus.forEach((r) => {
 				r.classList.remove("open");
-				const b = r.querySelector("button");
+				const b = r.querySelector("button.menu-button");
 				b && b.setAttribute("aria-expanded", "false");
 			});
 			openMenu = null;
 		}
-		function focusMenu(idx) {
-			const b = menus[idx]?.querySelector("button");
-			if (b) {
-				b.focus();
-			}
+		function open(r) {
+			r.classList.add("open");
+			const b = r.querySelector("button.menu-button");
+			b && b.setAttribute("aria-expanded", "true");
+			openMenu = r;
 		}
-		function handleListKeys(list, e) {
-			const items = Array.from(list.querySelectorAll("a"));
-			const idx = items.indexOf(document.activeElement);
-			if (e.key === "ArrowDown") {
-				e.preventDefault();
-				items[(idx + 1 + items.length) % items.length]?.focus();
-			}
-			if (e.key === "ArrowUp") {
-				e.preventDefault();
-				items[(idx - 1 + items.length) % items.length]?.focus();
-			}
-			if (e.key === "Home") {
-				e.preventDefault();
-				items[0]?.focus();
-			}
-			if (e.key === "End") {
-				e.preventDefault();
-				items[items.length - 1]?.focus();
-			}
-			if (e.key === "Escape") {
-				const parent = list.closest("[data-menu]");
-				const btn = parent?.querySelector("button");
-				closeAll();
-				btn?.focus();
-			}
-		}
-		menus.forEach((r, idx) => {
-			const btn = r.querySelector("button");
-			const list = r.querySelector(".menu-list");
-			btn.addEventListener("click", (e) => {
+
+		menus.forEach((r) => {
+			const btn = r.querySelector("button.menu-button");
+			btn.addEventListener("click", () => {
 				const isOpen = r.classList.contains("open");
 				closeAll();
-				if (!isOpen) {
-					r.classList.add("open");
-					btn.setAttribute("aria-expanded", "true");
-					openMenu = r;
-					r.querySelector(".menu-item a")?.focus();
-				}
+				if (!isOpen) open(r);
 			});
-			btn.addEventListener("keydown", (e) => {
-				if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
-					e.preventDefault();
-					r.classList.add("open");
-					btn.setAttribute("aria-expanded", "true");
-					r.querySelector(".menu-item a")?.focus();
-				}
-				if (e.key === "ArrowRight") {
-					e.preventDefault();
-					focusMenu((idx + 1) % menus.length);
-				}
-				if (e.key === "ArrowLeft") {
-					e.preventDefault();
-					focusMenu((idx - 1 + menus.length) % menus.length);
-				}
+			// close when leaving hover over that menu
+			r.addEventListener("mouseleave", () => {
+				if (r.classList.contains("open")) closeAll();
 			});
-			r.addEventListener("keydown", (e) => {
-				if (e.key === "Escape") {
-					closeAll();
-					btn.focus();
-				}
-			});
-			list.addEventListener("keydown", (e) => handleListKeys(list, e));
+			// if another menu is open, hovering this one switches
 			r.addEventListener("mouseenter", () => {
 				if (openMenu && openMenu !== r) {
 					closeAll();
-					r.classList.add("open");
-					btn.setAttribute("aria-expanded", "true");
-					openMenu = r;
+					open(r);
 				}
 			});
 		});
+
 		document.addEventListener("click", (e) => {
 			if (!root.contains(e.target)) closeAll();
 		});
+
+		// Update active app name when a window is focused
+		const appLabel = root.querySelector("[data-active-app-label]");
+		window.addEventListener("window-focused", (e) => {
+			const detail = (e && e.detail) || {};
+			if (detail && detail.title) {
+				appLabel.textContent = detail.title;
+			}
+		});
+
+		// Open About window from either Apple menu or right icon
+		function openAbout() {
+			try {
+				// @ts-ignore
+				const wm = window.__windowManager;
+				if (wm && wm.setVisible) {
+					wm.setVisible("about-window", true);
+					return;
+				}
+			} catch {}
+			try {
+				window.dispatchEvent(
+					new CustomEvent("window-visibility-change", {
+						detail: { id: "about-window", visible: true },
+					})
+				);
+			} catch {}
+		}
+
+		root.querySelectorAll("[data-open-about]").forEach((el) => {
+			el.addEventListener("click", openAbout);
+		});
+
 		function updateClock() {
 			const el = root.querySelector("[data-clock]");
 			const d = new Date();
@@ -213,5 +206,13 @@ const menus = [
 	})();
 </script>
 <style is:inline>
-	/***** Scoped overrides if needed *****/
+	.about-launch {
+		background: none;
+		border: 0;
+		padding: 0 6px;
+		height: 100%;
+		display: inline-flex;
+		align-items: center;
+		cursor: pointer;
+	}
 </style>
