@@ -48,17 +48,25 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		</button>
 		<ul class="menu-list" role="menu" aria-label="Application menu">
 			<li class="menu-item">
-				<button type="button" role="menuitem" data-action="hide">Hide</button>
+				<button type="button" role="menuitem" data-action="hide">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Hide</span>
+					<span class="menu-accel">⌘H</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem" data-action="hide-others"
-					>Hide Others</button
-				>
+				<button type="button" role="menuitem" data-action="hide-others">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Hide Others</span>
+					<span class="menu-accel">⌥⌘H</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem" data-action="show-all"
-					>Show All</button
-				>
+				<button type="button" role="menuitem" data-action="show-all">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Show All</span>
+					<span class="menu-accel"></span>
+				</button>
 			</li>
 		</ul>
 	</div>
@@ -73,13 +81,25 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		>
 		<ul class="menu-list" role="menu" aria-label="File menu">
 			<li class="menu-item">
-				<button type="button" role="menuitem">New</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">New</span>
+					<span class="menu-accel">⌘N</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Open…</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Open…</span>
+					<span class="menu-accel">⌘O</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Close</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Close</span>
+					<span class="menu-accel">⌘W</span>
+				</button>
 			</li>
 		</ul>
 	</div>
@@ -94,16 +114,32 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		>
 		<ul class="menu-list" role="menu" aria-label="Edit menu">
 			<li class="menu-item">
-				<button type="button" role="menuitem">Undo</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Undo</span>
+					<span class="menu-accel">⌘Z</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Cut</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Cut</span>
+					<span class="menu-accel">⌘X</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Copy</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Copy</span>
+					<span class="menu-accel">⌘C</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Paste</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Paste</span>
+					<span class="menu-accel">⌘V</span>
+				</button>
 			</li>
 		</ul>
 	</div>
@@ -118,13 +154,25 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 		>
 		<ul class="menu-list" role="menu" aria-label="View menu">
 			<li class="menu-item">
-				<button type="button" role="menuitem">Zoom In</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Zoom In</span>
+					<span class="menu-accel">⌘+</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Zoom Out</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Zoom Out</span>
+					<span class="menu-accel">⌘−</span>
+				</button>
 			</li>
 			<li class="menu-item">
-				<button type="button" role="menuitem">Actual Size</button>
+				<button type="button" role="menuitem">
+					<span class="menu-check" aria-hidden="true"></span>
+					<span class="menu-label">Actual Size</span>
+					<span class="menu-accel">⌘0</span>
+				</button>
 			</li>
 		</ul>
 	</div>
@@ -283,8 +331,11 @@ const base = (import.meta as any).env?.BASE_URL || "/";
 			if (t instanceof Element) {
 				const action = t.closest(".menu-item > button, .menu-item > a");
 				if (action) {
-					// trigger default click handlers
-					(action as HTMLElement).click();
+					if (typeof action.click === "function") {
+						action.click();
+					} else {
+						action.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+					}
 				}
 			}
 			closeAll();

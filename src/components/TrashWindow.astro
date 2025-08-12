@@ -1,0 +1,18 @@
+---
+import WindowBase from "./WindowBase.astro";
+---
+
+<WindowBase
+	title="Trash"
+	x={200}
+	y={120}
+	width={360}
+	height={260}
+	zIndex={12}
+	windowId="trash-window"
+	initiallyVisible={false}
+>
+	<div class="trash-content">
+		<p class="text-sm opacity-80">The Trash is empty.</p>
+	</div>
+</WindowBase>

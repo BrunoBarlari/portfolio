@@ -1,0 +1,24 @@
+---
+import WindowBase from "./WindowBase.astro";
+---
+
+<WindowBase
+	title="Hard Disk"
+	x={24}
+	y={80}
+	width={460}
+	height={320}
+	zIndex={12}
+	windowId="harddisk-window"
+	initiallyVisible={false}
+>
+	<div class="hd-content">
+		<p class="text-sm">Volume: Macintosh HD</p>
+		<div class="divider-double" aria-hidden="true"><span></span><span></span></div>
+		<ul class="text-sm list-disc pl-5 leading-relaxed">
+			<li>System Folder</li>
+			<li>Applications</li>
+			<li>Documents</li>
+		</ul>
+	</div>
+</WindowBase>
