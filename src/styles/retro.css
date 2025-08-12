@@ -418,3 +418,29 @@ html, body {
   margin-left: auto !important;
   opacity: .9 !important;
 }
+
+/* Retro System 7-style scrollbars (WebKit-based browsers) */
+*::-webkit-scrollbar { width: 14px; height: 14px; }
+*::-webkit-scrollbar-track {
+  background: #fff;
+  border: 1px solid #000;
+}
+*::-webkit-scrollbar-thumb {
+  background: #000;
+  border: 3px solid #fff; /* creates a white gap around black thumb */
+}
+*::-webkit-scrollbar-corner {
+  background: #fff;
+  border: 1px solid #000;
+}
+
+/* Firefox approximation */
+* { scrollbar-width: auto; scrollbar-color: #000 #fff; }
+
+/* Grow box: stronger diagonal (bottom-right of windows) */
+.window-resize-handle {
+  background:
+    linear-gradient(135deg, transparent 0 8px, #000 8px 9px, transparent 9px),
+    linear-gradient(135deg, transparent 0 12px, #000 12px 13px, transparent 13px),
+    linear-gradient(135deg, transparent 0 16px, #000 16px 17px, transparent 17px);
+}

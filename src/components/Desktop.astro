@@ -1,9 +1,11 @@
 ---
 /** Desktop: Fixed desktop environment background */
 import WindowDock from "./WindowDock.astro";
+import DesktopIcons from "./DesktopIcons.astro";
 ---
 
 <div class="desktop-background" data-desktop-canvas>
+	<DesktopIcons />
 	<slot />
 	<WindowDock />
 </div>
